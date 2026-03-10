@@ -1,49 +1,131 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, ChevronDown } from 'lucide-react';
+import { useRef } from 'react';
+
+// ============================================================
+// 🖼️ REPLACE THIS URL WITH YOUR OWN HERO IMAGE
+// ============================================================
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1504280390267-33106d153229?auto=format&fit=crop&w=1920&q=80';
 
 export const HeroSection = () => {
+    const ref = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ['start start', 'end start'],
+    });
+    const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+    const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    const textY = useTransform(scrollYProgress, [0, 0.5], [0, -60]);
+
     return (
-        <section className="relative h-[90vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden">
-            {/* Background Image */}
-            <div
-                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1504280390267-33106d153229?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")' }}
+        <section ref={ref} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden">
+            {/* Parallax Background */}
+            <motion.div
+                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
+                style={{
+                    backgroundImage: `url("${HERO_IMAGE}")`,
+                    y: backgroundY,
+                }}
             >
-                <div className="absolute inset-0 bg-black/40" />
-            </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+            </motion.div>
+
+            {/* Floating decorative particles */}
+            {[...Array(5)].map((_, i) => (
+                <motion.div
+                    key={i}
+                    className="absolute w-1.5 h-1.5 bg-white/20 rounded-full"
+                    style={{
+                        left: `${15 + i * 18}%`,
+                        top: `${20 + i * 12}%`,
+                    }}
+                    animate={{
+                        y: [0, -20, 0],
+                        opacity: [0.2, 0.5, 0.2],
+                    }}
+                    transition={{
+                        duration: 4 + i,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: i * 0.5,
+                    }}
+                />
+            ))}
 
             {/* Content */}
-            <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-                <motion.h1
-                    initial={{ opacity: 0, y: 30 }}
+            <motion.div
+                className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+                style={{ opacity: textOpacity, y: textY }}
+            >
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight drop-shadow-md"
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    className="mb-6"
                 >
-                    Escape to <span className="text-emerald-400">Nature's Paradise</span>
+                    <span className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-white/15 text-white/90 backdrop-blur-sm border border-white/20">
+                        Mabini, Bohol · Philippines
+                    </span>
+                </motion.div>
+
+                <motion.h1
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.1]"
+                >
+                    Escape to{' '}
+                    <span className="text-gradient bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">
+                        Nature's Paradise
+                    </span>
                 </motion.h1>
 
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="text-lg md:text-2xl text-slate-200 mb-10 drop-shadow-sm font-light"
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="text-base sm:text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
                 >
-                    Experience the serene beauty of Lakeside Campsite in Mabini, Bohol. Your perfect getaway under the stars awaits.
+                    Experience the serene beauty of Lakeside Campsite — your perfect getaway under the stars. Premium camping, lakefront views, unforgettable sunsets.
                 </motion.p>
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
+                    transition={{ duration: 0.6, delay: 0.9, type: 'spring', stiffness: 200 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                 >
-                    <Button size="lg" className="text-lg px-8 py-6 h-auto rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition-all hover:scale-105 group">
-                        <CalendarDays className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-                        Book Your Adventure Now
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                            size="lg"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-600/30 transition-all group"
+                        >
+                            <CalendarDays className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                            Book Your Adventure
+                        </Button>
+                    </motion.div>
+
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+                        >
+                            Explore Campsites
+                        </Button>
+                    </motion.div>
                 </motion.div>
-            </div>
+            </motion.div>
+
+            {/* Scroll indicator */}
+            <motion.div
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+                <ChevronDown className="h-8 w-8 text-white/50" />
+            </motion.div>
         </section>
     );
 };

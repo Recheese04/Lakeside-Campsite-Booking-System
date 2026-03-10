@@ -1,94 +1,163 @@
-import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useCallback } from 'react';
 
-const images = [
+// ============================================================
+// 🖼️ REPLACE THESE URLS WITH YOUR OWN CAMPSITE IMAGES
+// ============================================================
+const SLIDES = [
     {
-        url: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        caption: "Lakefront Tent Area"
+        image: 'https://images.unsplash.com/photo-1504280390267-33106d153229?auto=format&fit=crop&w=1200&q=80',
+        title: 'Lakefront Tent Area',
+        description: 'Wake up to stunning lake views from our premium waterfront camping spots.',
     },
     {
-        url: "https://images.unsplash.com/photo-1517824806704-9040b037703b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        caption: "Premium Glamping Setup"
+        image: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=1200&q=80',
+        title: 'Premium Glamping Setup',
+        description: 'Luxury canvas tents with real beds, electricity, and private decks.',
     },
     {
-        url: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        caption: "Cozy Bonfire Night"
+        image: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80',
+        title: 'Bonfire Nights',
+        description: 'Gather around the campfire under a blanket of stars every evening.',
     },
     {
-        url: "https://images.unsplash.com/photo-1627916568853-90d297ff0a59?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        caption: "Kayaking by the Lake"
-    }
+        image: 'https://images.unsplash.com/photo-1570141950081-2c5a05b76aff?auto=format&fit=crop&w=1200&q=80',
+        title: 'Kayaking by the Lake',
+        description: 'Explore crystal-clear waters with our complimentary kayak rentals.',
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
+        title: 'Nature Hiking Trails',
+        description: 'Over 15km of marked trails through lush tropical forests.',
+    },
 ];
 
+const slideVariants = {
+    enter: (direction: number) => ({
+        x: direction > 0 ? 400 : -400,
+        opacity: 0,
+        scale: 0.95,
+    }),
+    center: {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+    },
+    exit: (direction: number) => ({
+        x: direction < 0 ? 400 : -400,
+        opacity: 0,
+        scale: 0.95,
+    }),
+};
+
 export const ImageCarousel = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [[current, direction], setCurrent] = useState([0, 0]);
+
+    const paginate = useCallback(
+        (newDirection: number) => {
+            setCurrent(([prev]) => {
+                const next = (prev + newDirection + SLIDES.length) % SLIDES.length;
+                return [next, newDirection];
+            });
+        },
+        []
+    );
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            nextSlide();
-        }, 5000);
+        const timer = setInterval(() => paginate(1), 5000);
         return () => clearInterval(timer);
-    }, [currentIndex]);
-
-    const nextSlide = () => {
-        setCurrentIndex((prev) => (prev + 1) % images.length);
-    };
-
-    const prevSlide = () => {
-        setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    };
+    }, [paginate]);
 
     return (
-        <section className="py-20 bg-slate-50">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Discover the Grounds</h2>
-                    <p className="text-slate-600 max-w-2xl mx-auto">Explore our premium facilities and breathtaking views before you arrive.</p>
-                </div>
+        <section className="py-20 md:py-28 bg-gradient-to-b from-slate-50 to-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-100px' }}
+                    transition={{ duration: 0.7 }}
+                    className="text-center mb-14"
+                >
+                    <span className="text-emerald-600 font-medium text-sm tracking-widest uppercase">Gallery</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mt-2 mb-4">
+                        Discover the Grounds
+                    </h2>
+                    <p className="text-slate-500 text-lg max-w-xl mx-auto">
+                        Explore our premium facilities and breathtaking views before you arrive.
+                    </p>
+                </motion.div>
 
-                <div className="relative h-[400px] md:h-[600px] w-full overflow-hidden rounded-2xl shadow-xl group">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={currentIndex}
-                            initial={{ opacity: 0, x: 100 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -100 }}
-                            transition={{ duration: 0.5, ease: "easeInOut" }}
-                            className="absolute inset-0"
+                {/* Carousel */}
+                <div className="relative max-w-5xl mx-auto">
+                    <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-slate-200 shadow-2xl shadow-slate-200/60">
+                        <AnimatePresence initial={false} custom={direction} mode="wait">
+                            <motion.div
+                                key={current}
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                                className="absolute inset-0"
+                            >
+                                <img
+                                    src={SLIDES[current].image}
+                                    alt={SLIDES[current].title}
+                                    className="w-full h-full object-cover"
+                                />
+                                {/* Gradient overlay for caption */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+                                {/* Caption */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3, duration: 0.5 }}
+                                    className="absolute bottom-0 left-0 right-0 p-6 sm:p-10"
+                                >
+                                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">
+                                        {SLIDES[current].title}
+                                    </h3>
+                                    <p className="text-white/80 text-sm sm:text-base max-w-lg">
+                                        {SLIDES[current].description}
+                                    </p>
+                                </motion.div>
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {/* Navigation arrows */}
+                        <button
+                            onClick={() => paginate(-1)}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 transition-all"
                         >
-                            <img
-                                src={images[currentIndex].url}
-                                alt={images[currentIndex].caption}
-                                className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                                <p className="text-white text-xl md:text-2xl font-medium p-8">
-                                    {images[currentIndex].caption}
-                                </p>
-                            </div>
-                        </motion.div>
-                    </AnimatePresence>
-
-                    {/* Controls */}
-                    <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="secondary" size="icon" onClick={prevSlide} className="rounded-full bg-white/80 hover:bg-white text-slate-800">
-                            <ChevronLeft className="h-6 w-6" />
-                        </Button>
-                        <Button variant="secondary" size="icon" onClick={nextSlide} className="rounded-full bg-white/80 hover:bg-white text-slate-800">
-                            <ChevronRight className="h-6 w-6" />
-                        </Button>
+                            <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <button
+                            onClick={() => paginate(1)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 transition-all"
+                        >
+                            <ChevronRight className="h-5 w-5" />
+                        </button>
                     </div>
 
                     {/* Dots */}
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                        {images.map((_, idx) => (
+                    <div className="flex justify-center gap-2 mt-6">
+                        {SLIDES.map((_, i) => (
                             <button
-                                key={idx}
-                                onClick={() => setCurrentIndex(idx)}
-                                className={`w-3 h-3 rounded-full transition-colors ${idx === currentIndex ? 'bg-white' : 'bg-white/50 hover:bg-white/80'}`}
-                            />
+                                key={i}
+                                onClick={() => setCurrent([i, i > current ? 1 : -1])}
+                                className="group p-1"
+                            >
+                                <motion.div
+                                    className={`h-2 rounded-full transition-colors ${i === current ? 'bg-emerald-600' : 'bg-slate-300 group-hover:bg-slate-400'
+                                        }`}
+                                    animate={{ width: i === current ? 32 : 8 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+                            </button>
                         ))}
                     </div>
                 </div>

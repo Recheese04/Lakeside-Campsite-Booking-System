@@ -1,72 +1,125 @@
-import { Facebook, Instagram, Twitter, MapPin, Mail, Phone } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MapPin, Phone, Mail, Facebook, Instagram, Twitter } from 'lucide-react';
+
+const footerLinks = [
+    {
+        title: 'Explore',
+        links: ['Home', 'Campsites', 'Activities', 'Gallery', 'Pricing'],
+    },
+    {
+        title: 'Support',
+        links: ['FAQs', 'Booking Policy', 'Cancellation', 'Contact Us'],
+    },
+];
+
+const socialIcons = [
+    { icon: Facebook, href: '#', label: 'Facebook' },
+    { icon: Instagram, href: '#', label: 'Instagram' },
+    { icon: Twitter, href: '#', label: 'Twitter' },
+];
 
 export const Footer = () => {
     return (
-        <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-
-                    {/* Brand Info */}
-                    <div className="md:col-span-1">
-                        <h3 className="text-white text-xl font-bold mb-4">Lakeside Campsite</h3>
-                        <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-                            Experience the best of Philippine nature. We provide premium outdoor accommodations for families and adventurers alike.
+        <footer className="bg-slate-900 text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                {/* Main grid */}
+                <div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+                    {/* Brand */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="sm:col-span-2 lg:col-span-1"
+                    >
+                        <h3 className="text-xl font-bold mb-3">
+                            <span className="text-emerald-400">Lakeside</span> Campsite
+                        </h3>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-5 max-w-xs font-sans">
+                            Your premier camping destination in the heart of Bohol, Philippines. Reconnect with nature at its finest.
                         </p>
-                    </div>
+                        {/* Social icons */}
+                        <div className="flex gap-3">
+                            {socialIcons.map((social) => {
+                                const Icon = social.icon;
+                                return (
+                                    <motion.a
+                                        key={social.label}
+                                        href={social.href}
+                                        whileHover={{ scale: 1.15, y: -2 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-emerald-600 flex items-center justify-center transition-colors duration-300"
+                                        aria-label={social.label}
+                                    >
+                                        <Icon className="h-4 w-4" />
+                                    </motion.a>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Explore</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-emerald-400 transition-colors">Home</a></li>
-                            <li><a href="#" className="hover:text-emerald-400 transition-colors">Campsites</a></li>
-                            <li><a href="#" className="hover:text-emerald-400 transition-colors">Amenities</a></li>
-                            <li><a href="#" className="hover:text-emerald-400 transition-colors">Book Now</a></li>
-                            <li><a href="#" className="hover:text-emerald-400 transition-colors">Contact</a></li>
-                        </ul>
-                    </div>
+                    {/* Links */}
+                    {footerLinks.map((group, i) => (
+                        <motion.div
+                            key={group.title}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
+                        >
+                            <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 font-sans">
+                                {group.title}
+                            </h4>
+                            <ul className="space-y-2.5">
+                                {group.links.map((link) => (
+                                    <li key={link}>
+                                        <a
+                                            href="#"
+                                            className="text-sm text-slate-400 hover:text-emerald-400 transition-colors duration-200 font-sans"
+                                        >
+                                            {link}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    ))}
 
-                    {/* Contact Details */}
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Contact Us</h4>
-                        <ul className="space-y-3 text-sm">
-                            <li className="flex items-center gap-3">
-                                <MapPin className="w-4 h-4 text-emerald-500" />
+                    {/* Contact */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                    >
+                        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 font-sans">
+                            Contact Us
+                        </h4>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-3 text-sm text-slate-400 font-sans">
+                                <MapPin className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
                                 Mabini, Bohol, Philippines
                             </li>
-                            <li className="flex items-center gap-3">
-                                <Phone className="w-4 h-4 text-emerald-500" />
+                            <li className="flex items-center gap-3 text-sm text-slate-400 font-sans">
+                                <Phone className="h-4 w-4 text-emerald-400 shrink-0" />
                                 +63 912 345 6789
                             </li>
-                            <li className="flex items-center gap-3">
-                                <Mail className="w-4 h-4 text-emerald-500" />
-                                hello@lakesidecampsite.ph
+                            <li className="flex items-center gap-3 text-sm text-slate-400 font-sans">
+                                <Mail className="h-4 w-4 text-emerald-400 shrink-0" />
+                                info@lakesidecampsite.com
                             </li>
                         </ul>
-                    </div>
-
-                    {/* Socials */}
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Follow Us</h4>
-                        <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 transition-colors text-white">
-                                <Facebook className="w-5 h-5" />
-                            </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 transition-colors text-white">
-                                <Instagram className="w-5 h-5" />
-                            </a>
-                            <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 transition-colors text-white">
-                                <Twitter className="w-5 h-5" />
-                            </a>
-                        </div>
-                    </div>
+                    </motion.div>
                 </div>
 
-                <div className="border-t border-slate-800 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-                    <p>&copy; {new Date().getFullYear()} Lakeside Campsite Booking System. All rights reserved.</p>
-                    <div className="flex gap-4 mt-4 md:mt-0">
-                        <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                {/* Bottom bar */}
+                <div className="py-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p className="text-xs text-slate-500 font-sans">
+                        © 2026 Lakeside Campsite Booking System. All rights reserved.
+                    </p>
+                    <div className="flex gap-4">
+                        <a href="#" className="text-xs text-slate-500 hover:text-slate-300 transition-colors font-sans">Privacy</a>
+                        <a href="#" className="text-xs text-slate-500 hover:text-slate-300 transition-colors font-sans">Terms</a>
                     </div>
                 </div>
             </div>

@@ -1,26 +1,55 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { CalendarDays, ArrowRight } from 'lucide-react';
+
+// ============================================================
+// 🖼️ REPLACE THIS URL WITH YOUR OWN CTA BACKGROUND IMAGE
+// ============================================================
+const CTA_IMAGE = 'https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=1920&q=80';
 
 export const CtaSection = () => {
     return (
-        <section className="relative py-24 overflow-hidden">
-            {/* Background Overlay */}
+        <section className="relative py-28 md:py-36 overflow-hidden">
+            {/* Background image with overlay */}
             <div
-                className="absolute inset-0 z-0 bg-cover bg-center object-cover opacity-90"
-                style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1510312305653-8ed496efae75?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")' }}
+                className="absolute inset-0 bg-cover bg-center bg-fixed"
+                style={{ backgroundImage: `url("${CTA_IMAGE}")` }}
             >
-                <div className="absolute inset-0 bg-emerald-900/80 mix-blend-multiply" />
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-teal-800/80" />
             </div>
 
-            <div className="relative z-10 container mx-auto px-4 max-w-4xl text-center">
-                <motion.h2
+            {/* Decorative shapes */}
+            <motion.div
+                className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/5"
+                animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.1, 0.05] }}
+                transition={{ duration: 6, repeat: Infinity }}
+            />
+            <motion.div
+                className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/5"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.08, 0.05] }}
+                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+            />
+
+            <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+                <motion.span
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-4xl md:text-5xl font-bold text-white mb-6"
+                    transition={{ duration: 0.5 }}
+                    className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-white/15 text-white/90 backdrop-blur-sm border border-white/20 mb-6"
                 >
-                    Ready to Reconnect with Nature?
+                    Limited Spots Available
+                </motion.span>
+
+                <motion.h2
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.7, delay: 0.1 }}
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+                >
+                    Ready to Reconnect{' '}
+                    <span className="text-emerald-300">with Nature?</span>
                 </motion.h2>
 
                 <motion.p
@@ -28,23 +57,29 @@ export const CtaSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-emerald-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto"
+                    className="text-lg text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
                 >
-                    Spaces fill up fast during the peak season. Secure your spot at Lakeside Campsite today and prepare for an unforgettable adventure.
+                    Book your lakeside campsite today and create memories that last a lifetime.
+                    Special rates available for groups and extended stays.
                 </motion.p>
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
+                    transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center"
                 >
-                    <Button
-                        size="lg"
-                        className="text-lg px-10 py-6 h-auto rounded-full bg-white text-emerald-800 hover:bg-emerald-50 font-semibold shadow-xl transition-all hover:scale-105"
-                    >
-                        Check Availability Now
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                            size="lg"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-white text-emerald-800 hover:bg-emerald-50 shadow-xl shadow-black/20 font-semibold group"
+                        >
+                            <CalendarDays className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                            Check Availability
+                            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                        </Button>
+                    </motion.div>
                 </motion.div>
             </div>
         </section>

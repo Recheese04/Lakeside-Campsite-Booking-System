@@ -1,85 +1,126 @@
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Star, Quote } from 'lucide-react';
 
-const reviews = [
+const TESTIMONIALS = [
     {
-        name: "Maria Santos",
-        avatar: "https://i.pravatar.cc/150?u=maria",
+        name: 'Maria Santos',
+        location: 'Manila, Philippines',
         rating: 5,
-        comment: "Absolutely breathtaking! The glamping setup was perfectly clean and the lake views in the morning are unmatched. Will definitely return."
+        text: 'Absolutely breathtaking! The glamping setup was perfectly clean and the lake views were incredible. Our family had the best weekend here. Will definitely come back!',
+        avatar: 'MS',
     },
     {
-        name: "Juan Reyes",
-        avatar: "https://i.pravatar.cc/150?u=juan",
+        name: 'Juan Reyes',
+        location: 'Cebu City, Philippines',
         rating: 5,
-        comment: "Our family had the best weekend here. The facilities are top-notch without taking away the rugged feel of camping. Highly recommended for beginners."
+        text: 'We celebrated our anniversary here and it was magical. The bonfire night under the stars, the kayaking — everything was top-notch. The staff were incredibly friendly.',
+        avatar: 'JR',
     },
     {
-        name: "Elena Garcia",
-        avatar: "https://i.pravatar.cc/150?u=elena",
-        rating: 4,
-        comment: "Great spot with endless activities. We loved the kayaking and the evening bonfire. The booking process was very smooth as well."
-    }
+        name: 'Elena Garcia',
+        location: 'Tagbilaran, Bohol',
+        rating: 5,
+        text: 'Best camping experience in Bohol. Great spot with endless activities. We loved the kayaking and the hiking trails. Clean facilities and beautiful scenery all around.',
+        avatar: 'EG',
+    },
 ];
 
-const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.2 } }
-};
-
-const item = {
-    hidden: { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+const cardVariants = {
+    hidden: (i: number) => ({
+        opacity: 0,
+        x: i % 2 === 0 ? -50 : 50,
+        y: 20,
+    }),
+    visible: (i: number) => ({
+        opacity: 1,
+        x: 0,
+        y: 0,
+        transition: {
+            duration: 0.7,
+            delay: i * 0.15,
+            ease: [0.25, 0.46, 0.45, 0.94],
+        },
+    }),
 };
 
 export const TestimonialsSection = () => {
     return (
-        <section className="py-20 bg-emerald-50/50">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-emerald-900 mb-4">Happy Campers</h2>
-                    <p className="text-emerald-700/80 max-w-2xl mx-auto">Don't just take our word for it. Here is what our guests have to say about their stay.</p>
-                </div>
+        <section className="py-20 md:py-28 bg-slate-50 relative overflow-hidden">
+            {/* Subtle background */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-100/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
 
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                {/* Header */}
                 <motion.div
-                    variants={container}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: "-100px" }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-100px' }}
+                    transition={{ duration: 0.7 }}
+                    className="text-center mb-14"
                 >
-                    {reviews.map((review, idx) => (
-                        <motion.div key={idx} variants={item}>
-                            <Card className="h-full border-emerald-100 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md">
-                                <CardContent className="pt-8 relative">
-                                    {/* Rating Stars */}
-                                    <div className="flex text-amber-400 mb-4">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className={`w-5 h-5 ${i < review.rating ? 'fill-current' : 'text-slate-200'}`} />
-                                        ))}
-                                    </div>
+                    <span className="text-emerald-600 font-medium text-sm tracking-widest uppercase">Testimonials</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mt-2 mb-4">
+                        Happy Campers
+                    </h2>
+                    <p className="text-slate-500 text-lg max-w-xl mx-auto">
+                        Hear what our guests have to say about their lakeside experience.
+                    </p>
+                </motion.div>
 
-                                    <p className="text-slate-600 mb-6 italic leading-relaxed">
-                                        "{review.comment}"
-                                    </p>
+                {/* Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                    {TESTIMONIALS.map((testimonial, i) => (
+                        <motion.div
+                            key={testimonial.name}
+                            custom={i}
+                            variants={cardVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: '-50px' }}
+                            whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                            className="relative bg-white rounded-2xl p-7 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 border border-slate-100 transition-shadow duration-300"
+                        >
+                            {/* Quote icon */}
+                            <Quote className="h-8 w-8 text-emerald-100 mb-4 -scale-x-100" />
 
-                                    <div className="flex items-center gap-4 mt-auto">
-                                        <img
-                                            src={review.avatar}
-                                            alt={review.name}
-                                            className="w-12 h-12 rounded-full ring-2 ring-emerald-100"
-                                        />
-                                        <div>
-                                            <p className="font-semibold text-emerald-900">{review.name}</p>
-                                            <p className="text-xs text-emerald-600">Verified Guest</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            {/* Stars */}
+                            <div className="flex gap-1 mb-4">
+                                {[...Array(testimonial.rating)].map((_, j) => (
+                                    <motion.div
+                                        key={j}
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        whileInView={{ opacity: 1, scale: 1 }}
+                                        viewport={{ once: true }}
+                                        transition={{
+                                            delay: i * 0.15 + j * 0.08,
+                                            type: 'spring',
+                                            stiffness: 400,
+                                            damping: 10,
+                                        }}
+                                    >
+                                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            <p className="text-slate-600 text-sm leading-relaxed mb-6 font-sans">
+                                "{testimonial.text}"
+                            </p>
+
+                            {/* Author */}
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xs font-bold">
+                                    {testimonial.avatar}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-slate-900 font-sans">{testimonial.name}</p>
+                                    <p className="text-xs text-slate-400">{testimonial.location}</p>
+                                </div>
+                            </div>
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
             </div>
         </section>
     );
