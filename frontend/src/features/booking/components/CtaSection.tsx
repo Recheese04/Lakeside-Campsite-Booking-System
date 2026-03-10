@@ -15,18 +15,18 @@ export const CtaSection = () => {
                 className="absolute inset-0 bg-cover bg-center bg-fixed"
                 style={{ backgroundImage: `url("${CTA_IMAGE}")` }}
             >
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-teal-800/80" />
+                <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/80" />
             </div>
 
             {/* Decorative shapes */}
             <motion.div
-                className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/5"
-                animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.1, 0.05] }}
+                className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-primary/10"
+                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 6, repeat: Infinity }}
             />
             <motion.div
-                className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/5"
-                animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.08, 0.05] }}
+                className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-teal-500/10"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1 }}
             />
 
@@ -36,7 +36,7 @@ export const CtaSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-white/15 text-white/90 backdrop-blur-sm border border-white/20 mb-6"
+                    className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-primary/20 text-primary-foreground backdrop-blur-md border border-primary/30 mb-6"
                 >
                     Limited Spots Available
                 </motion.span>
@@ -46,10 +46,10 @@ export const CtaSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.7, delay: 0.1 }}
-                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight"
                 >
                     Ready to Reconnect{' '}
-                    <span className="text-emerald-300">with Nature?</span>
+                    <span className="text-primary">with Nature?</span>
                 </motion.h2>
 
                 <motion.p
@@ -57,7 +57,7 @@ export const CtaSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-lg text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
+                    className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto font-light leading-relaxed"
                 >
                     Book your lakeside campsite today and create memories that last a lifetime.
                     Special rates available for groups and extended stays.
@@ -73,7 +73,7 @@ export const CtaSection = () => {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
                         <Button
                             size="lg"
-                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-white text-emerald-800 hover:bg-emerald-50 shadow-xl shadow-black/20 font-semibold group"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 font-semibold group"
                         >
                             <CalendarDays className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
                             Check Availability

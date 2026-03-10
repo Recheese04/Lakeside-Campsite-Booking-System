@@ -1,4 +1,4 @@
-import { Header } from '../components/Header';
+import { Navbar } from '../components/Navbar';
 import { HeroSection } from '../features/campsite/components/HeroSection';
 import { ImageCarousel } from '../features/campsite/components/ImageCarousel';
 import { FeaturesSection } from '../features/campsite/components/FeaturesSection';
@@ -9,8 +9,9 @@ import { ParallaxDivider } from '../features/campsite/components/ParallaxDivider
 
 export const Home = () => {
     return (
-        <div className="min-h-screen bg-slate-50 font-sans flex flex-col relative">
-            <Header />
+        // Adding 'dark' class here forces the entire homepage into dark mode
+        <div className="dark min-h-screen bg-background text-foreground font-sans flex flex-col">
+            <Navbar />
             <main className="flex-grow">
                 {/* 1. Hero */}
                 <HeroSection />
