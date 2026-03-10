@@ -4,10 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Phone, ArrowRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../../components/ui/card';
+import { useAuth } from '../../../context/AuthContext';
 
 const SignupPage: React.FC = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -18,11 +21,13 @@ const SignupPage: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
         try {
             const response = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
@@ -31,13 +36,13 @@ const SignupPage: React.FC = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem('token', data.token);
-                navigate('/');
+                login(data.token, data.user);
+                navigate('/dashboard');
             } else {
-                alert(data.error);
+                setError(data.error || 'Signup failed. Please try again.');
             }
-        } catch (error) {
-            alert('Signup failed. Please try again.');
+        } catch {
+            setError('Unable to connect. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -72,7 +77,7 @@ const SignupPage: React.FC = () => {
                                         name="firstName"
                                         type="text"
                                         required
-                                        placeholder="John"
+                                        placeholder="Juan"
                                         onChange={handleChange}
                                         className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                                     />
@@ -83,7 +88,7 @@ const SignupPage: React.FC = () => {
                                         name="lastName"
                                         type="text"
                                         required
-                                        placeholder="Doe"
+                                        placeholder="dela Cruz"
                                         onChange={handleChange}
                                         className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                                     />
@@ -110,7 +115,7 @@ const SignupPage: React.FC = () => {
                                     <input
                                         name="phone"
                                         type="tel"
-                                        placeholder="+1 (555) 000-0000"
+                                        placeholder="+63 9XX XXX XXXX"
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                                     />
@@ -130,6 +135,15 @@ const SignupPage: React.FC = () => {
                                     />
                                 </div>
                             </div>
+                            {error && (
+                                <motion.p
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg"
+                                >
+                                    {error}
+                                </motion.p>
+                            )}
                             <Button
                                 type="submit"
                                 disabled={isLoading}

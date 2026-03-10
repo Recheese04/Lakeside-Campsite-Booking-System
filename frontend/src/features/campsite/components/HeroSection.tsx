@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, ChevronDown } from 'lucide-react';
 import { useRef } from 'react';
 
-import heroVideo from '@/images/herovid.mp4';
+import heroVideo from '@/images/campsitevid.mp4';
 
 // ============================================================
 // 🎥 USING YOUR LOCAL VIDEO

@@ -4,22 +4,24 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../../components/ui/card';
+import { useAuth } from '../../../context/AuthContext';
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const [error, setError] = useState('');
+    const [formData, setFormData] = useState({ email: '', password: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
         try {
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
@@ -28,13 +30,13 @@ const LoginPage: React.FC = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem('token', data.token);
-                navigate('/');
+                login(data.token, data.user);
+                navigate('/dashboard');
             } else {
-                alert(data.error);
+                setError(data.error || 'Login failed. Please try again.');
             }
-        } catch (error) {
-            alert('Login failed. Please try again.');
+        } catch {
+            setError('Unable to connect. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -93,6 +95,15 @@ const LoginPage: React.FC = () => {
                                     />
                                 </div>
                             </div>
+                            {error && (
+                                <motion.p
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg"
+                                >
+                                    {error}
+                                </motion.p>
+                            )}
                             <Button
                                 type="submit"
                                 disabled={isLoading}
