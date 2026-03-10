@@ -35,3 +35,6 @@ Thumbs.db
 
 # Prisma generated
 prisma/migrations/
+
+# Leftover Vite scaffold
+temp-front/
