@@ -45,10 +45,10 @@ const cardVariants = {
 
 export const TestimonialsSection = () => {
     return (
-        <section className="py-20 md:py-28 bg-slate-50 relative overflow-hidden">
-            {/* Subtle background */}
-            <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-100/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <section className="py-20 md:py-28 bg-muted/30 relative overflow-hidden">
+            {/* Subtle background blurs */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Header */}
@@ -59,11 +59,11 @@ export const TestimonialsSection = () => {
                     transition={{ duration: 0.7 }}
                     className="text-center mb-14"
                 >
-                    <span className="text-emerald-600 font-medium text-sm tracking-widest uppercase">Testimonials</span>
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mt-2 mb-4">
+                    <span className="text-primary font-medium text-sm tracking-widest uppercase">Testimonials</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mt-2 mb-4">
                         Happy Campers
                     </h2>
-                    <p className="text-slate-500 text-lg max-w-xl mx-auto">
+                    <p className="text-muted-foreground text-lg max-w-xl mx-auto">
                         Hear what our guests have to say about their lakeside experience.
                     </p>
                 </motion.div>
@@ -79,10 +79,10 @@ export const TestimonialsSection = () => {
                             whileInView="visible"
                             viewport={{ once: true, margin: '-50px' }}
                             whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                            className="relative bg-white rounded-2xl p-7 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 border border-slate-100 transition-shadow duration-300"
+                            className="relative bg-card rounded-2xl p-7 shadow-sm hover:shadow-xl hover:shadow-primary/5 border border-border/50 transition-all duration-300"
                         >
                             {/* Quote icon */}
-                            <Quote className="h-8 w-8 text-emerald-100 mb-4 -scale-x-100" />
+                            <Quote className="h-8 w-8 text-primary/20 mb-4 -scale-x-100" />
 
                             {/* Stars */}
                             <div className="flex gap-1 mb-4">
@@ -104,18 +104,18 @@ export const TestimonialsSection = () => {
                                 ))}
                             </div>
 
-                            <p className="text-slate-600 text-sm leading-relaxed mb-6 font-sans">
+                            <p className="text-card-foreground text-sm leading-relaxed mb-6 font-sans">
                                 "{testimonial.text}"
                             </p>
 
                             {/* Author */}
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xs font-bold">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-teal-400 flex items-center justify-center text-primary-foreground text-xs font-bold shadow-inner">
                                     {testimonial.avatar}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-slate-900 font-sans">{testimonial.name}</p>
-                                    <p className="text-xs text-slate-400">{testimonial.location}</p>
+                                    <p className="text-sm font-semibold text-foreground font-sans">{testimonial.name}</p>
+                                    <p className="text-xs text-muted-foreground">{testimonial.location}</p>
                                 </div>
                             </div>
                         </motion.div>

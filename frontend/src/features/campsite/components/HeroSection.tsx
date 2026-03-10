@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, ChevronDown } from 'lucide-react';
 import { useRef } from 'react';
 
+import heroVideo from '@/images/herovid.mp4';
+
 // ============================================================
-// 🖼️ REPLACE THIS URL WITH YOUR OWN HERO IMAGE
+// 🎥 USING YOUR LOCAL VIDEO
 // ============================================================
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1504280390267-33106d153229?auto=format&fit=crop&w=1920&q=80';
+const HERO_VIDEO = heroVideo;
 
 export const HeroSection = () => {
     const ref = useRef<HTMLDivElement>(null);
@@ -20,15 +22,21 @@ export const HeroSection = () => {
 
     return (
         <section ref={ref} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden">
-            {/* Parallax Background */}
+            {/* Parallax Video Background */}
             <motion.div
-                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-110"
-                style={{
-                    backgroundImage: `url("${HERO_IMAGE}")`,
-                    y: backgroundY,
-                }}
+                className="absolute inset-0 z-0 scale-105"
+                style={{ y: backgroundY }}
             >
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                >
+                    <source src={HERO_VIDEO} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/60" />
             </motion.div>
 
             {/* Floating decorative particles */}
@@ -55,7 +63,7 @@ export const HeroSection = () => {
 
             {/* Content */}
             <motion.div
-                className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+                className="relative z-10 text-center px-6 max-w-5xl mx-auto mt-16"
                 style={{ opacity: textOpacity, y: textY }}
             >
                 <motion.div
@@ -64,7 +72,7 @@ export const HeroSection = () => {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="mb-6"
                 >
-                    <span className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-white/15 text-white/90 backdrop-blur-sm border border-white/20">
+                    <span className="inline-block px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase bg-white/10 text-white/90 backdrop-blur-md border border-white/20">
                         Mabini, Bohol · Philippines
                     </span>
                 </motion.div>
@@ -76,7 +84,7 @@ export const HeroSection = () => {
                     className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.1]"
                 >
                     Escape to{' '}
-                    <span className="text-gradient bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">
+                    <span className="text-gradient bg-gradient-to-r from-primary to-teal-200 bg-clip-text text-transparent">
                         Nature's Paradise
                     </span>
                 </motion.h1>
@@ -85,7 +93,7 @@ export const HeroSection = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
-                    className="text-base sm:text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
+                    className="text-base sm:text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow"
                 >
                     Experience the serene beauty of Lakeside Campsite — your perfect getaway under the stars. Premium camping, lakefront views, unforgettable sunsets.
                 </motion.p>
@@ -99,7 +107,7 @@ export const HeroSection = () => {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
                         <Button
                             size="lg"
-                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-600/30 transition-all group"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 transition-all group"
                         >
                             <CalendarDays className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
                             Book Your Adventure
@@ -110,7 +118,7 @@ export const HeroSection = () => {
                         <Button
                             size="lg"
                             variant="outline"
-                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+                            className="text-base sm:text-lg px-8 py-6 h-auto rounded-full bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-md"
                         >
                             Explore Campsites
                         </Button>
