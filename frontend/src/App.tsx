@@ -6,6 +6,7 @@ import { BookingPage } from './features/booking/pages/BookingPage';
 import SignupPage from './features/auth/pages/SignupPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import DashboardPage from './features/dashboard/pages/DashboardPage';
+import AdminDashboardPage from './features/admin/pages/AdminDashboardPage';
 import './index.css';
 
 function App() {
@@ -22,6 +23,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute>
+                                <AdminDashboardPage />
                             </ProtectedRoute>
                         }
                     />
