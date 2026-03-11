@@ -22,6 +22,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
     const [activeSection, setActiveSection] = useState(navItems[0]?.id ?? 'overview');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const handleLogout = () => { logout(); navigate('/'); };
 
@@ -92,7 +93,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
 
             {/* Bottom actions */}
             <div className="px-3 py-3 border-t border-white/10 flex-shrink-0 space-y-1">
-                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200">
+                <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200">
                     <LogOut className="w-4 h-4" /> Log Out
                 </button>
             </div>
@@ -185,7 +186,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                                                 <Settings className="w-4 h-4" /> {isAdmin ? 'User Dashboard' : 'Settings'}
                                             </button>
                                             <button
-                                                onClick={handleLogout}
+                                                onClick={() => { setProfileMenuOpen(false); setShowLogoutModal(true); }}
                                                 className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                             >
                                                 <LogOut className="w-4 h-4" /> Log Out
@@ -227,6 +228,48 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                     </footer>
                 </main>
             </div>
+
+            {/* ═══ Logout Confirmation Modal ═══ */}
+            <AnimatePresence>
+                {showLogoutModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+                        onClick={() => setShowLogoutModal(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+                            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <LogOut className="w-6 h-6 text-red-500" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">Log Out</h3>
+                            <p className="text-sm text-gray-500 mb-6">Are you sure you want to log out of your account?</p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowLogoutModal(false)}
+                                    className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                                >
+                                    <LogOut className="w-3.5 h-3.5" /> Log Out
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

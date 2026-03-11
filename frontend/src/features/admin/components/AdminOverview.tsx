@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    CalendarDays, Users, DollarSign, UtensilsCrossed, Package,
+    CalendarDays, DollarSign, UtensilsCrossed,
     ArrowRight, CheckCircle, Clock, Tent,
-    TrendingUp, ArrowUpRight, LogIn, LogOut as LogOutIcon, Loader2
+    TrendingUp, ArrowUpRight, LogIn, Loader2
 } from 'lucide-react';
 import api from '../../../services/api';
 

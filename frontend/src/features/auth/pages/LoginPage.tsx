@@ -22,6 +22,8 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,12 +43,16 @@ const LoginPage: React.FC = () => {
             const data = await response.json();
             if (response.ok) {
                 login(data.token, data.user);
-                // Redirect based on role
-                if (data.user.role === 'ADMIN') {
-                    navigate('/admin');
-                } else {
-                    navigate('/dashboard');
-                }
+                setLoggedInUser(data.user);
+                setShowSuccess(true);
+                // Navigate after showing success modal
+                setTimeout(() => {
+                    if (data.user.role === 'ADMIN') {
+                        navigate('/admin');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                }, 1800);
             } else {
                 setError(data.error || 'Login failed. Please try again.');
             }
@@ -309,6 +315,50 @@ const LoginPage: React.FC = () => {
                     </p>
                 </motion.div>
             </div>
+
+            {/* ═══ Login Success Modal ═══ */}
+            <AnimatePresence>
+                {showSuccess && loggedInUser && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+                            className="bg-white rounded-2xl shadow-2xl px-8 py-6 max-w-xs w-full text-center"
+                        >
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
+                                className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/25"
+                            >
+                                <motion.svg
+                                    className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"
+                                >
+                                    <motion.path
+                                        d="M5 13l4 4L19 7"
+                                        initial={{ pathLength: 0 }}
+                                        animate={{ pathLength: 1 }}
+                                        transition={{ delay: 0.25, duration: 0.35 }}
+                                    />
+                                </motion.svg>
+                            </motion.div>
+                            <p className="text-sm font-semibold text-gray-800 mb-1">Welcome, {loggedInUser.firstName}!</p>
+                            <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                                <div className="w-3.5 h-3.5 border-2 border-green-200 border-t-green-600 rounded-full animate-spin" />
+                                Directing to {loggedInUser.role === 'ADMIN' ? 'admin panel' : 'dashboard'}…
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
