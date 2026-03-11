@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Phone, ArrowRight, User, Eye, EyeOff, Tent, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import authimage from '../../../images/caro2.jpg';
 
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -79,7 +80,7 @@ const SignupPage: React.FC = () => {
             <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden">
                 <div className="absolute inset-0">
                     <img
-                        src="https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?auto=format&fit=crop&w=1600&q=80"
+                        src={authimage}
                         alt="Glamping setup"
                         className="w-full h-full object-cover"
                     />
@@ -165,7 +166,7 @@ const SignupPage: React.FC = () => {
                 {/* Mobile background image */}
                 <div className="absolute inset-0 lg:hidden">
                     <img
-                        src="https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?auto=format&fit=crop&w=1200&q=80"
+                        src={authimage}
                         alt=""
                         className="w-full h-full object-cover"
                     />

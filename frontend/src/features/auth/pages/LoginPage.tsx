@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Tent, Trees, Mountain, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import authimage from '@/images/campsitevid.mp4';
+import authimage from '../../../images/caro2.jpg';
+
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -63,7 +64,7 @@ const LoginPage: React.FC = () => {
                 {/* Background image */}
                 <div className="absolute inset-0">
                     <img
-                        src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1600&q=80"
+                        src={authimage}
                         alt="Lakeside campsite"
                         className="w-full h-full object-cover"
                     />
@@ -150,7 +151,7 @@ const LoginPage: React.FC = () => {
                 {/* Mobile background image — visible only below lg */}
                 <div className="absolute inset-0 lg:hidden">
                     <img
-                        src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80"
+                        src={authimage}
                         alt=""
                         className="w-full h-full object-cover"
                     />
