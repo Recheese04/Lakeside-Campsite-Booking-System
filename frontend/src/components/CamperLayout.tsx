@@ -23,8 +23,15 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
 
-    const handleLogout = () => { logout(); navigate('/'); };
+    const handleLogout = () => {
+        setLoggingOut(true);
+        setTimeout(() => {
+            logout();
+            navigate('/');
+        }, 1500);
+    };
 
     const isAdmin = variant === 'admin';
     const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : (isAdmin ? 'A' : 'U');
@@ -237,7 +244,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
-                        onClick={() => setShowLogoutModal(false)}
+                        onClick={() => !loggingOut && setShowLogoutModal(false)}
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -247,25 +254,42 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                             className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <LogOut className="w-6 h-6 text-red-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">Log Out</h3>
-                            <p className="text-sm text-gray-500 mb-6">Are you sure you want to log out of your account?</p>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => setShowLogoutModal(false)}
-                                    className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                            {loggingOut ? (
+                                /* ── Logging out animation ── */
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
                                 >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                                >
-                                    <LogOut className="w-3.5 h-3.5" /> Log Out
-                                </button>
-                            </div>
+                                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <div className="w-6 h-6 border-[2.5px] border-red-200 border-t-red-500 rounded-full animate-spin" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-800 mb-1">Logging out...</p>
+                                    <p className="text-xs text-gray-400">See you next time!</p>
+                                </motion.div>
+                            ) : (
+                                /* ── Confirmation prompt ── */
+                                <>
+                                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <LogOut className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1">Log Out</h3>
+                                    <p className="text-sm text-gray-500 mb-6">Are you sure you want to log out of your account?</p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowLogoutModal(false)}
+                                            className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                                        >
+                                            <LogOut className="w-3.5 h-3.5" /> Log Out
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}
