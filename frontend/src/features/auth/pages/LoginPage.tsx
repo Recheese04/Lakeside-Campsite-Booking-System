@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Tent, Trees, Mountain, Sparkles } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { useAuth } from '../../../context/AuthContext';
 import authimage from '../../../images/caro2.jpg';
