@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, Plus, Edit2, Trash2, Users, Calendar, TreePine, Loader2, X, Save } from 'lucide-react';
-import api from '../../../services/api';
+import api, { uploadImage } from '../../../services/api';
 import { ListItemSkeleton } from '../../../components/Skeleton';
 
 interface Equipment {
@@ -44,8 +44,9 @@ export default function EquipmentManagement() {
     const [modalType, setModalType] = useState<'equipment' | 'activity'>('equipment');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [eqForm, setEqForm] = useState({ name: '', description: '', pricePerDay: '', stock: '' });
-    const [actForm, setActForm] = useState({ name: '', description: '', price: '', capacity: '', schedule: '' });
+    const [actForm, setActForm] = useState({ name: '', description: '', price: '', capacity: '', schedule: '', imageUrl: '' });
     const [saving, setSaving] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const fetchData = async () => {
         try {
@@ -66,26 +67,34 @@ export default function EquipmentManagement() {
 
     useEffect(() => { fetchData(); }, []);
 
-    const openAddEquipment = () => { setModalType('equipment'); setEditingId(null); setEqForm({ name: '', description: '', pricePerDay: '', stock: '' }); setShowModal(true); };
-    const openEditEquipment = (e: Equipment) => { setModalType('equipment'); setEditingId(e.id); setEqForm({ name: e.name, description: e.description || '', pricePerDay: String(e.pricePerDay), stock: String(e.stock) }); setShowModal(true); };
-    const openAddActivity = () => { setModalType('activity'); setEditingId(null); setActForm({ name: '', description: '', price: '', capacity: '', schedule: '' }); setShowModal(true); };
-    const openEditActivity = (a: Activity) => { setModalType('activity'); setEditingId(a.id); setActForm({ name: a.name, description: a.description || '', price: String(a.price), capacity: String(a.capacity), schedule: a.schedule || '' }); setShowModal(true); };
+    const openAddEquipment = () => { setModalType('equipment'); setEditingId(null); setEqForm({ name: '', description: '', pricePerDay: '', stock: '', imageUrl: '' } as any); setSelectedFile(null); setShowModal(true); };
+    const openEditEquipment = (e: Equipment) => { setModalType('equipment'); setEditingId(e.id); setEqForm({ name: e.name, description: e.description || '', pricePerDay: String(e.pricePerDay), stock: String(e.stock), imageUrl: e.imageUrl || '' } as any); setSelectedFile(null); setShowModal(true); };
+    const openAddActivity = () => { setModalType('activity'); setEditingId(null); setActForm({ name: '', description: '', price: '', capacity: '', schedule: '', imageUrl: '' }); setSelectedFile(null); setShowModal(true); };
+    const openEditActivity = (a: Activity) => { setModalType('activity'); setEditingId(a.id); setActForm({ name: a.name, description: a.description || '', price: String(a.price), capacity: String(a.capacity), schedule: a.schedule || '', imageUrl: (a as any).imageUrl || '' }); setSelectedFile(null); setShowModal(true); };
 
     const handleSubmit = async () => {
         try {
             setSaving(true);
+            
+            let finalImageUrl = modalType === 'equipment' ? (eqForm as any).imageUrl || null : actForm.imageUrl || null;
+            if (selectedFile) {
+                finalImageUrl = await uploadImage(selectedFile);
+            }
+
             if (modalType === 'equipment') {
-                const data = { name: eqForm.name, description: eqForm.description || null, pricePerDay: parseFloat(eqForm.pricePerDay), stock: parseInt(eqForm.stock) };
+                const data = { name: eqForm.name, description: eqForm.description || null, pricePerDay: parseFloat(eqForm.pricePerDay), stock: parseInt(eqForm.stock), imageUrl: finalImageUrl };
                 if (editingId) await api.put(`/admin/equipment/${editingId}`, data);
                 else await api.post('/admin/equipment', data);
             } else {
-                const data = { name: actForm.name, description: actForm.description || null, price: parseFloat(actForm.price), capacity: parseInt(actForm.capacity), schedule: actForm.schedule || null };
+                const data = { name: actForm.name, description: actForm.description || null, price: parseFloat(actForm.price), capacity: parseInt(actForm.capacity), schedule: actForm.schedule || null, imageUrl: finalImageUrl };
                 if (editingId) await api.put(`/admin/activities/${editingId}`, data);
                 else await api.post('/admin/activities', data);
             }
             setShowModal(false); await fetchData();
-        } catch (err: any) { alert(err.response?.data?.error || 'Failed to save'); }
-        finally { setSaving(false); }
+        } catch (err: any) {
+            console.error('Equipment save error:', err);
+            alert(err.response?.data?.error || 'Failed to save');
+        } finally { setSaving(false); }
     };
 
     const handleDeleteEquipment = async (id: string) => { if (!confirm('Delete this equipment?')) return; try { await api.delete(`/admin/equipment/${id}`); await fetchData(); } catch (err: any) { alert(err.response?.data?.error || 'Failed to delete'); } };
@@ -112,40 +121,66 @@ export default function EquipmentManagement() {
             </div>
 
             {tab === 'equipment' && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
-                    {equipment.length === 0 && <p className="text-sm text-gray-400 text-center py-8">No equipment yet</p>}
-                    {equipment.map((item, i) => (
-                        <motion.div key={item.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                            className="flex items-center justify-between px-5 py-4 hover:bg-green-50/30 transition-colors">
-                            <div><p className="text-sm font-semibold text-gray-800">{item.name}</p><p className="text-xs text-gray-400">₱{Number(item.pricePerDay).toLocaleString()}/day · Stock: {item.stock}</p></div>
-                            <div className="flex items-center gap-3">
-                                <span className={`text-xs font-semibold ${item.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>{item.stock > 0 ? 'Available' : 'Out of stock'}</span>
-                                <div className="flex gap-1">
-                                    <button onClick={() => openEditEquipment(item)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><Edit2 className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDeleteEquipment(item.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                    {equipment.length === 0 && <p className="text-sm text-gray-400 text-center py-12">No equipment yet</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {equipment.map((item, i) => (
+                            <motion.div key={item.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+                                <div className="relative h-36 bg-gray-100 overflow-hidden">
+                                    {item.imageUrl ? (
+                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center"><Package className="w-10 h-10 text-gray-300" /></div>
+                                    )}
+                                    <span className={`absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm ${item.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>{item.stock > 0 ? 'Available' : 'Out of stock'}</span>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                                <div className="p-4">
+                                    <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">{item.name}</h4>
+                                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                        <span className="font-bold text-green-700 text-sm">₱{Number(item.pricePerDay).toLocaleString()}<span className="font-normal text-gray-400 text-xs">/day</span></span>
+                                        <span>Stock: {item.stock}</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEditEquipment(item)} className="flex-1 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Edit2 className="w-3 h-3" /> Edit</button>
+                                        <button onClick={() => handleDeleteEquipment(item.id)} className="flex-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </motion.div>
             )}
 
             {tab === 'activities' && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
-                    {activities.length === 0 && <p className="text-sm text-gray-400 text-center py-8">No activities yet</p>}
-                    {activities.map((act, i) => (
-                        <motion.div key={act.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                            className="flex items-center justify-between px-5 py-4 hover:bg-green-50/30 transition-colors">
-                            <div><p className="text-sm font-semibold text-gray-800">{act.name}</p><p className="text-xs text-gray-400">{act.schedule || 'No schedule'} · ₱{Number(act.price).toLocaleString()}/person</p></div>
-                            <div className="flex items-center gap-4">
-                                <span className="text-xs font-semibold text-gray-600"><Users className="w-3 h-3 inline mr-1" />Capacity: {act.capacity}</span>
-                                <div className="flex gap-1">
-                                    <button onClick={() => openEditActivity(act)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><Edit2 className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDeleteActivity(act.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                    {activities.length === 0 && <p className="text-sm text-gray-400 text-center py-12">No activities yet</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {activities.map((act, i) => (
+                            <motion.div key={act.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+                                <div className="relative h-36 bg-gray-100 overflow-hidden">
+                                    {(act as any).imageUrl ? (
+                                        <img src={(act as any).imageUrl} alt={act.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center"><TreePine className="w-10 h-10 text-gray-300" /></div>
+                                    )}
+                                    <span className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-600"><Users className="w-3 h-3 inline mr-1" />{act.capacity} pax</span>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                                <div className="p-4">
+                                    <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">{act.name}</h4>
+                                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                        <span className="font-bold text-green-700 text-sm">₱{Number(act.price).toLocaleString()}<span className="font-normal text-gray-400 text-xs">/person</span></span>
+                                        <span>{act.schedule || 'No schedule'}</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEditActivity(act)} className="flex-1 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Edit2 className="w-3 h-3" /> Edit</button>
+                                        <button onClick={() => handleDeleteActivity(act.id)} className="flex-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </motion.div>
             )}
 
@@ -178,6 +213,11 @@ export default function EquipmentManagement() {
                                     <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Price/Day (₱)</label><input type="number" value={eqForm.pricePerDay} onChange={e => setEqForm({ ...eqForm, pricePerDay: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm" placeholder="400" /></div>
                                     <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Stock</label><input type="number" value={eqForm.stock} onChange={e => setEqForm({ ...eqForm, stock: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm" placeholder="10" /></div>
                                 </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Equipment Image</label>
+                                    <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                    {(eqForm as any).imageUrl && <p className="text-xs text-gray-500 mt-2 truncate">Current: {(eqForm as any).imageUrl}</p>}
+                                </div>
                                 <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Description</label><textarea rows={2} value={eqForm.description} onChange={e => setEqForm({ ...eqForm, description: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none" /></div>
                             </div>
                         ) : (
@@ -188,6 +228,11 @@ export default function EquipmentManagement() {
                                     <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Capacity</label><input type="number" value={actForm.capacity} onChange={e => setActForm({ ...actForm, capacity: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm" placeholder="20" /></div>
                                 </div>
                                 <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Schedule</label><input value={actForm.schedule} onChange={e => setActForm({ ...actForm, schedule: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm" placeholder="Daily 8AM–5PM" /></div>
+                                <div>
+                                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Activity Image</label>
+                                    <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                    {actForm.imageUrl && <p className="text-xs text-gray-500 mt-2 truncate">Current: {actForm.imageUrl}</p>}
+                                </div>
                                 <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Description</label><textarea rows={2} value={actForm.description} onChange={e => setActForm({ ...actForm, description: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none" /></div>
                             </div>
                         )}

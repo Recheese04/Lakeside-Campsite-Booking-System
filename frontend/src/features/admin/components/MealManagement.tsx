@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UtensilsCrossed, Plus, Edit2, Trash2, X, Clock, DollarSign, TrendingUp, Search, Loader2, Save } from 'lucide-react';
-import api from '../../../services/api';
+import api, { uploadImage } from '../../../services/api';
 import { SearchSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 
 interface MenuItem {
@@ -42,6 +42,7 @@ export default function MealManagement() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const fetchData = async () => {
         try {
@@ -62,9 +63,10 @@ export default function MealManagement() {
 
     useEffect(() => { fetchData(); }, []);
 
-    const openAdd = () => { setEditingId(null); setForm(emptyForm); setShowAdd(true); };
+    const openAdd = () => { setEditingId(null); setForm(emptyForm); setSelectedFile(null); setShowAdd(true); };
     const openEdit = (item: MenuItem) => {
         setEditingId(item.id);
+        setSelectedFile(null);
         setForm({ name: item.name, description: item.description || '', price: String(item.price), category: item.category, imageUrl: item.imageUrl || '' });
         setShowAdd(true);
     };
@@ -72,7 +74,13 @@ export default function MealManagement() {
     const handleSubmit = async () => {
         try {
             setSaving(true);
-            const data = { name: form.name, description: form.description || null, price: parseFloat(form.price), category: form.category, imageUrl: form.imageUrl || null };
+            
+            let finalImageUrl = form.imageUrl || null;
+            if (selectedFile) {
+                finalImageUrl = await uploadImage(selectedFile);
+            }
+
+            const data = { name: form.name, description: form.description || null, price: parseFloat(form.price), category: form.category, imageUrl: finalImageUrl };
             if (editingId) {
                 await api.put(`/admin/meals/items/${editingId}`, data);
             } else {
@@ -81,6 +89,7 @@ export default function MealManagement() {
             setShowAdd(false); setForm(emptyForm); setEditingId(null);
             await fetchData();
         } catch (err: any) {
+            console.error('Menu item save error:', err);
             alert(err.response?.data?.error || 'Failed to save menu item');
         } finally { setSaving(false); }
     };
@@ -121,18 +130,29 @@ export default function MealManagement() {
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                     <div className="relative"><Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                         <input type="text" placeholder="Search menu..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" /></div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
-                        {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-8">No menu items</p>}
+                    {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-12">No menu items</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filtered.map((item, i) => (
-                            <motion.div key={item.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                                className="flex items-center justify-between px-5 py-4 hover:bg-green-50/30 transition-colors">
-                                <div className="flex items-center gap-3"><div className={`w-2 h-2 rounded-full ${item.available ? 'bg-green-500' : 'bg-red-400'}`} />
-                                    <div><p className="text-sm font-semibold text-gray-800">{item.name}</p><p className="text-xs text-gray-400">{item.category}{item.description ? ` · ${item.description}` : ''}</p></div></div>
-                                <div className="flex items-center gap-3"><p className="text-sm font-bold text-green-700">₱{Number(item.price).toLocaleString()}</p>
-                                    <div className="flex gap-1">
-                                        <button onClick={() => openEdit(item)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => handleDelete(item.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
-                                    </div></div>
+                            <motion.div key={item.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+                                <div className="relative h-36 bg-gray-100 overflow-hidden">
+                                    {item.imageUrl ? (
+                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center"><UtensilsCrossed className="w-10 h-10 text-gray-300" /></div>
+                                    )}
+                                    <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm ${item.available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>{item.available ? 'Available' : 'Unavailable'}</span>
+                                    <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-600">{item.category}</span>
+                                </div>
+                                <div className="p-4">
+                                    <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">{item.name}</h4>
+                                    {item.description && <p className="text-xs text-gray-400 mb-2 line-clamp-2">{item.description}</p>}
+                                    <p className="font-bold text-green-700 text-sm mb-3">₱{Number(item.price).toLocaleString()}</p>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEdit(item)} className="flex-1 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Edit2 className="w-3 h-3" /> Edit</button>
+                                        <button onClick={() => handleDelete(item.id)} className="flex-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                                    </div>
+                                </div>
                             </motion.div>
                         ))}
                     </div>
@@ -170,6 +190,11 @@ export default function MealManagement() {
                                     <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm"><option value="BREAKFAST">Breakfast</option><option value="LUNCH">Lunch</option><option value="DINNER">Dinner</option><option value="SNACK">Snack</option><option value="DRINK">Drink</option></select></div>
                                 <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Price (₱)</label><input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="350" className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm" /></div></div>
                             <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Description</label><textarea rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Describe..." className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none" /></div>
+                            <div>
+                                <label className="text-xs font-semibold text-gray-600 mb-1 block">Item Image</label>
+                                <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                {form.imageUrl && <p className="text-xs text-gray-500 mt-2 truncate">Current: {form.imageUrl}</p>}
+                            </div>
                         </div>
                         <div className="flex gap-3 mt-5"><button onClick={() => setShowAdd(false)} className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl">Cancel</button>
                             <button onClick={handleSubmit} disabled={saving || !form.name || !form.price}

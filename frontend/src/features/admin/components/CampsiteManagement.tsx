@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tent, Plus, Edit2, Trash2, X, Calendar, Eye, Users, Search, LogIn, LogOut as LogOutIcon, Loader2, Save } from 'lucide-react';
-import api from '../../../services/api';
+import api, { uploadImage } from '../../../services/api';
 import { SearchSkeleton, TableRowSkeleton } from '../../../components/Skeleton';
 
 interface Campsite {
@@ -20,7 +20,7 @@ interface Campsite {
 
 const statusStyle: Record<string, string> = { AVAILABLE: 'bg-green-100 text-green-700', MAINTENANCE: 'bg-amber-100 text-amber-700', CLOSED: 'bg-red-100 text-red-700' };
 
-const emptyForm = { name: '', description: '', pricePerNight: '', capacity: '', location: '', status: 'AVAILABLE', amenities: '' as string };
+const emptyForm = { name: '', description: '', pricePerNight: '', capacity: '', location: '', status: 'AVAILABLE', amenities: '' as string, images: '' as string };
 
 export default function CampsiteManagement() {
     const [campsites, setCampsites] = useState<Campsite[]>([]);
@@ -32,6 +32,7 @@ export default function CampsiteManagement() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const fetchCampsites = async () => {
         try {
@@ -51,11 +52,13 @@ export default function CampsiteManagement() {
     const openAdd = () => {
         setEditingId(null);
         setForm(emptyForm);
+        setSelectedFile(null);
         setShowAddModal(true);
     };
 
     const openEdit = (c: Campsite) => {
         setEditingId(c.id);
+        setSelectedFile(null);
         setForm({
             name: c.name,
             description: c.description,
@@ -63,7 +66,8 @@ export default function CampsiteManagement() {
             capacity: String(c.capacity),
             location: c.location || '',
             status: c.status,
-            amenities: c.amenities.join(', '),
+            amenities: c.amenities ? c.amenities.join(', ') : '',
+            images: c.images ? c.images.join(', ') : '',
         });
         setShowAddModal(true);
     };
@@ -71,6 +75,13 @@ export default function CampsiteManagement() {
     const handleSubmit = async () => {
         try {
             setSaving(true);
+            
+            let imageUrls = form.images ? form.images.split(',').map(s => s.trim()).filter(Boolean) : [];
+            if (selectedFile) {
+                const uploadedUrl = await uploadImage(selectedFile);
+                imageUrls.push(uploadedUrl);
+            }
+
             const data = {
                 name: form.name,
                 description: form.description,
@@ -78,7 +89,8 @@ export default function CampsiteManagement() {
                 capacity: parseInt(form.capacity),
                 location: form.location || null,
                 status: form.status,
-                amenities: form.amenities ? form.amenities.split(',').map(s => s.trim()) : [],
+                amenities: form.amenities ? form.amenities.split(',').map(s => s.trim()).filter(Boolean) : [],
+                images: imageUrls,
             };
             if (editingId) {
                 await api.put(`/admin/campsites/${editingId}`, data);
@@ -90,6 +102,7 @@ export default function CampsiteManagement() {
             setEditingId(null);
             await fetchCampsites();
         } catch (err: any) {
+            console.error('Campsite save error:', err);
             alert(err.response?.data?.error || 'Failed to save campsite');
         } finally {
             setSaving(false);
@@ -147,50 +160,33 @@ export default function CampsiteManagement() {
                         <input type="text" placeholder="Search campsites..." value={search} onChange={e => setSearch(e.target.value)}
                             className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead><tr className="bg-gray-50 border-b border-gray-100">
-                                    {['Campsite', 'Location', 'Capacity', 'Price/Night', 'Status', 'Bookings', 'Actions'].map(h => (
-                                        <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
-                                    ))}
-                                </tr></thead>
-                                <tbody>
-                                    {filtered.length === 0 && <tr><td colSpan={7} className="text-center py-8 text-gray-400">No campsites found</td></tr>}
-                                    {filtered.map((c, i) => (
-                                    <motion.tr key={c.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                                        className="border-b border-gray-50 hover:bg-green-50/30 transition-colors">
-                                        <td className="px-5 py-3"><span className="font-semibold text-gray-800">{c.name}</span></td>
-                                        <td className="px-5 py-3 text-gray-600">{c.location || '—'}</td>
-                                        <td className="px-5 py-3 text-gray-600"><Users className="w-3 h-3 inline mr-1" />{c.capacity}</td>
-                                        <td className="px-5 py-3 font-bold text-green-700">₱{Number(c.pricePerNight).toLocaleString()}</td>
-                                        <td className="px-5 py-3"><span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusStyle[c.status] || 'bg-gray-100 text-gray-600'}`}>{c.status}</span></td>
-                                        <td className="px-5 py-3 text-gray-600">{c._count?.bookings || 0}</td>
-                                        <td className="px-5 py-3"><div className="flex gap-1">
-                                            <button onClick={() => openEdit(c)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => handleDelete(c.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                        </div></td>
-                                    </motion.tr>
-                                ))}</tbody>
-                            </table>
-                        </div>
-                        <div className="md:hidden divide-y divide-gray-100">{filtered.map(c => (
-                            <div key={c.id} className="p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div><p className="font-semibold text-gray-800 text-sm">{c.name}</p><p className="text-xs text-gray-400">{c.location || 'No location'}</p></div>
-                                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusStyle[c.status] || 'bg-gray-100 text-gray-600'}`}>{c.status}</span>
+                    {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-12">No campsites found</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filtered.map((c, i) => (
+                            <motion.div key={c.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+                                <div className="relative h-40 bg-gray-100 overflow-hidden">
+                                    {c.images && c.images.length > 0 ? (
+                                        <img src={c.images[0]} alt={c.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center"><Tent className="w-10 h-10 text-gray-300" /></div>
+                                    )}
+                                    <span className={`absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm ${statusStyle[c.status] || 'bg-gray-100 text-gray-600'}`}>{c.status}</span>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
-                                    <div><p className="text-gray-400">Capacity</p><p className="font-medium text-gray-700">{c.capacity}</p></div>
-                                    <div><p className="text-gray-400">Price</p><p className="font-bold text-green-700">₱{Number(c.pricePerNight).toLocaleString()}</p></div>
-                                    <div><p className="text-gray-400">Bookings</p><p className="font-medium text-gray-700">{c._count?.bookings || 0}</p></div>
+                                <div className="p-4">
+                                    <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">{c.name}</h4>
+                                    <p className="text-xs text-gray-400 mb-3">{c.location || 'No location set'}</p>
+                                    <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{c.capacity} pax</span>
+                                        <span className="font-bold text-green-700 text-sm">₱{Number(c.pricePerNight).toLocaleString()}<span className="font-normal text-gray-400 text-xs">/night</span></span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEdit(c)} className="flex-1 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Edit2 className="w-3 h-3" /> Edit</button>
+                                        <button onClick={() => handleDelete(c.id)} className="flex-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors flex items-center justify-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2 mt-2">
-                                    <button onClick={() => openEdit(c)} className="text-xs font-semibold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">Edit</button>
-                                    <button onClick={() => handleDelete(c.id)} className="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg">Delete</button>
-                                </div>
-                            </div>
-                        ))}</div>
+                            </motion.div>
+                        ))}
                     </div>
                 </motion.div>
             )}
@@ -226,6 +222,11 @@ export default function CampsiteManagement() {
                                 </select>
                             </div>
                             <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Amenities (comma separated)</label><input value={form.amenities} onChange={e => setForm({ ...form, amenities: e.target.value })} placeholder="wifi, bonfire_pit, restroom" className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30" /></div>
+                            <div>
+                                <label className="text-xs font-semibold text-gray-600 mb-1 block">Campsite Image</label>
+                                <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                {form.images && <p className="text-xs text-gray-500 mt-2 truncate">Current: {form.images}</p>}
+                            </div>
                             <div><label className="text-xs font-semibold text-gray-600 mb-1 block">Description</label><textarea rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Describe this campsite..." className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500/30" /></div>
                         </div>
                         <div className="flex gap-3 mt-5">
