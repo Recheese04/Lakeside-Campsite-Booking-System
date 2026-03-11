@@ -92,7 +92,9 @@ const LoginPage: React.FC = () => {
                             <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</p>
+                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                Lakeside <span className="text-emerald-400">Campsite</span>
+                            </p>
                             <p className="text-white/50 text-[11px] font-medium tracking-wide uppercase">Mabini, Bohol</p>
                         </div>
                     </Link>
@@ -183,7 +185,9 @@ const LoginPage: React.FC = () => {
                         <div className="w-11 h-11 rounded-xl overflow-hidden bg-green-700/20 border border-green-600/30">
                             <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
-                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
+                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            Lakeside <span className="text-emerald-500">Campsite</span>
+                        </span>
                     </Link>
 
                     {/* Header */}

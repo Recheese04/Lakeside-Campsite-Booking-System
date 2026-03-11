@@ -28,7 +28,7 @@ export const Navbar = () => {
                         <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                     </div>
                     <span className={`text-xl font-bold tracking-tight ${isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'}`}>
-                        Lakeside
+                        Lakeside <span className="text-primary">Campsite</span>
                     </span>
                 </Link>
 

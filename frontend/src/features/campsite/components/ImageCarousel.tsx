@@ -52,7 +52,7 @@ export const ImageCarousel = () => {
                         Explore Our <span className="text-primary">Grounds</span>
                     </h2>
                     <p className="text-muted-foreground text-base sm:text-lg max-w-lg mx-auto">
-                        Discover the beauty that awaits you at Lakeside — from serene waters to lush trails.
+                        Discover the beauty that awaits you at <span className="text-foreground font-semibold">Lakeside</span> <span className="text-primary font-bold">Campsite</span> — from serene waters to lush trails.
                     </p>
                 </motion.div>
 

@@ -52,7 +52,12 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                     <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                    <p className="font-bold text-sm leading-tight">{isAdmin ? 'Lakeside Admin' : 'Lakeside'}</p>
+                    <p className="font-bold text-sm leading-tight">
+                        {isAdmin ? 
+                            <span>Lakeside <span className="text-emerald-400">Admin</span></span> : 
+                            <span>Lakeside <span className="text-emerald-400">Campsite</span></span>
+                        }
+                    </p>
                     <p className="text-white/60 text-xs">{isAdmin ? 'Control Panel' : 'Mabini, Bohol'}</p>
                 </div>
                 {mobile && (
