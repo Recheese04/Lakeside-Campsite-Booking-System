@@ -29,10 +29,16 @@ export const ParallaxDivider = ({
 
     return (
         <section ref={ref} className="relative overflow-hidden" style={{ height }}>
-            <motion.div className="absolute inset-0 -top-[12%] -bottom-[12%]" style={{ y }}>
-                <img src={bgImage} alt="" className="w-full h-full object-cover" />
+            <motion.div className="absolute inset-0 -top-[12%] -bottom-[12%] overflow-hidden" style={{ y }}>
+                <motion.img 
+                    src={bgImage} 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                />
             </motion.div>
-            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-black/45 pointer-events-none" />
 
             {(overlayText || overlaySubtext) && (
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">

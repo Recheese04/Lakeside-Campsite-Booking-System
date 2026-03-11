@@ -6,10 +6,16 @@ import { Link } from 'react-router-dom';
 import caro5 from '@/images/caro5.jpg';
 
 export const CtaSection = () => (
-    <section className="relative py-28 md:py-36 overflow-hidden">
-        {/* BG image */}
-        <div className="absolute inset-0">
-            <img src={caro5} alt="" className="w-full h-full object-cover" />
+    <section className="relative py-28 md:py-36 overflow-hidden group">
+        {/* BG image with slow zoom animation */}
+        <div className="absolute inset-0 overflow-hidden">
+            <motion.img 
+                src={caro5} 
+                alt="" 
+                className="w-full h-full object-cover"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/70" />
         </div>
 

@@ -25,23 +25,36 @@ export const FeaturesSection = () => (
                 <motion.div
                     initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }} transition={{ duration: 0.8 }}
-                    className="relative"
+                    className="relative group"
                 >
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-black/10 aspect-[4/3]">
-                        <img src={caro1} alt="Campsite" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent" />
+                        <motion.img 
+                            src={caro1} 
+                            alt="Campsite" 
+                            className="w-full h-full object-cover transform origin-center" 
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.7, ease: "easeOut" }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
                     </div>
                     {/* Floating overlay card */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.5 }}
-                        className="absolute -bottom-6 -right-4 sm:right-6 bg-card/90 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-border/50 flex items-center gap-3"
+                        whileHover={{ y: -5, scale: 1.02 }}
+                        className="absolute -bottom-6 -right-4 sm:right-6 bg-card/90 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-border/50 flex items-center gap-3 cursor-pointer group/card"
                     >
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                            <img src={caro3} alt="" className="w-full h-full object-cover" />
+                            <motion.img 
+                                src={caro3} 
+                                alt="" 
+                                className="w-full h-full object-cover"
+                                whileHover={{ scale: 1.15 }}
+                                transition={{ duration: 0.4 }}
+                            />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-foreground">World-Class Camping</p>
+                            <p className="text-xs font-bold text-foreground group-hover/card:text-primary transition-colors">World-Class Camping</p>
                             <p className="text-[10px] text-muted-foreground">Rated 4.9 by 500+ guests</p>
                         </div>
                     </motion.div>

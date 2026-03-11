@@ -66,11 +66,18 @@ export const ImageCarousel = () => {
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: direction < 0 ? 600 : -600, opacity: 0 }}
                             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                            className="absolute inset-0"
+                            className="absolute inset-0 overflow-hidden"
                         >
-                            <img src={SLIDES[current].image} alt={SLIDES[current].title} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+                            <motion.img 
+                                src={SLIDES[current].image} 
+                                alt={SLIDES[current].title} 
+                                className="w-full h-full object-cover pointer-events-none"
+                                initial={{ scale: 1.05 }}
+                                animate={{ scale: 1 }}
+                                transition={{ duration: 6, ease: "easeOut" }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent pointer-events-none" />
 
                             {/* Caption overlay */}
                             <motion.div
@@ -100,54 +107,47 @@ export const ImageCarousel = () => {
                     </button>
                 </div>
 
-                {/* ═══ Thumbnail strip + Stats ═══ */}
-                <div className="flex flex-col lg:flex-row gap-5">
-                    {/* Thumbnails */}
-                    <div className="flex gap-2.5 flex-1 overflow-x-auto pb-1 scrollbar-hide">
-                        {SLIDES.map((slide, i) => (
-                            <motion.button
-                                key={i}
-                                onClick={() => setCurrent([i, i > current ? 1 : -1])}
-                                className={`relative flex-shrink-0 w-28 sm:w-32 h-20 sm:h-24 rounded-xl overflow-hidden border-2 transition-all ${
-                                    i === current ? 'border-primary shadow-lg shadow-primary/20 scale-[1.02]' : 'border-transparent opacity-50 hover:opacity-80'
-                                }`}
-                                whileHover={{ scale: 1.04 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
-                                {i === current && (
-                                    <motion.div
-                                        layoutId="thumb-active"
-                                        className="absolute inset-0 border-2 border-primary rounded-xl"
-                                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                                    />
-                                )}
-                            </motion.button>
-                        ))}
-                    </div>
+                {/* ═══ Thumbnails — full width ═══ */}
+                <div className="grid grid-cols-6 gap-2 sm:gap-3 mb-6">
+                    {SLIDES.map((slide, i) => (
+                        <motion.button
+                            key={i}
+                            onClick={() => setCurrent([i, i > current ? 1 : -1])}
+                            className={`relative aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all ${
+                                i === current ? 'border-primary shadow-lg shadow-primary/20' : 'border-transparent opacity-40 hover:opacity-75'
+                            }`}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                        >
+                            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+                            {i === current && (
+                                <div className="absolute inset-0 bg-primary/10" />
+                            )}
+                        </motion.button>
+                    ))}
+                </div>
 
-                    {/* Stats badges */}
-                    <div className="flex lg:flex-col gap-3 lg:w-52">
-                        {STATS.map((stat) => {
-                            const Icon = stat.icon;
-                            return (
-                                <motion.div
-                                    key={stat.label}
-                                    initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }} transition={{ duration: 0.4 }}
-                                    className="flex-1 bg-card rounded-xl p-3 sm:p-4 border border-border/50 flex items-center gap-3"
-                                >
-                                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                                        <Icon className={`w-4 h-4 ${stat.color}`} />
-                                    </div>
-                                    <div>
-                                        <p className="text-base sm:text-lg font-bold text-foreground leading-tight">{stat.value}</p>
-                                        <p className="text-[11px] text-muted-foreground">{stat.label}</p>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
+                {/* ═══ Stats row ═══ */}
+                <div className="grid grid-cols-3 gap-3">
+                    {STATS.map((stat, i) => {
+                        const Icon = stat.icon;
+                        return (
+                            <motion.div
+                                key={stat.label}
+                                initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }}
+                                className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-3"
+                            >
+                                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                                    <Icon className={`w-4 h-4 ${stat.color}`} />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-bold text-foreground leading-tight">{stat.value}</p>
+                                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
         </section>
