@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Phone, ArrowRight, User, Eye, EyeOff, Tent, Trees, StarIcon, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, Phone, ArrowRight, User, Eye, EyeOff, Tent, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 const GoogleIcon = () => (
@@ -161,18 +161,28 @@ const SignupPage: React.FC = () => {
             </div>
 
             {/* ═══ RIGHT — Form Panel ═══ */}
-            <div className="flex-1 flex items-center justify-center bg-gray-50 px-5 py-8 lg:px-12 relative overflow-y-auto">
-                <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+            <div className="flex-1 flex items-center justify-center bg-gray-50 lg:bg-gray-50 px-5 py-8 lg:px-12 relative overflow-y-auto">
+                {/* Mobile background image */}
+                <div className="absolute inset-0 lg:hidden">
+                    <img
+                        src="https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?auto=format&fit=crop&w=1200&q=80"
+                        alt=""
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/70 via-green-900/60 to-black/80" />
+                </div>
+                {/* Desktop subtle pattern */}
+                <div className="absolute inset-0 opacity-[0.015] hidden lg:block" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="w-full max-w-[440px] relative z-10"
+                    className="w-full max-w-[440px] relative z-10 lg:bg-transparent bg-white/95 backdrop-blur-xl lg:backdrop-blur-none rounded-2xl lg:rounded-none p-6 lg:p-0 shadow-2xl lg:shadow-none border border-white/20 lg:border-0"
                 >
                     {/* Mobile logo */}
-                    <Link to="/" className="lg:hidden flex items-center gap-3 mb-6 justify-center">
-                        <div className="p-2 bg-green-50 rounded-xl border border-green-100">
+                    <Link to="/" className="lg:hidden flex items-center gap-3 mb-5 justify-center">
+                        <div className="p-2 bg-green-700/20 rounded-xl border border-green-600/30">
                             <Tent className="w-5 h-5 text-green-700" />
                         </div>
                         <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
