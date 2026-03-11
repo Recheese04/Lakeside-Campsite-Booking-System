@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
 import { useAuth } from '../../../context/AuthContext';
 
 const GoogleIcon = () => (
@@ -42,7 +41,12 @@ const LoginPage: React.FC = () => {
             const data = await response.json();
             if (response.ok) {
                 login(data.token, data.user);
-                navigate('/dashboard');
+                // Redirect based on role
+                if (data.user.role === 'ADMIN') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setError(data.error || 'Login failed. Please try again.');
             }

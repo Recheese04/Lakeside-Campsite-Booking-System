@@ -37,7 +37,12 @@ const SignupPage: React.FC = () => {
             const data = await response.json();
             if (response.ok) {
                 login(data.token, data.user);
-                navigate('/dashboard');
+                // Redirect based on role
+                if (data.user.role === 'ADMIN') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setError(data.error || 'Signup failed. Please try again.');
             }
