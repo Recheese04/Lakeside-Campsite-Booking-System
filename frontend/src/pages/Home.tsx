@@ -9,36 +9,35 @@ import { ParallaxDivider } from '../features/campsite/components/ParallaxDivider
 
 export const Home = () => {
     return (
-        // Adding 'dark' class here forces the entire homepage into dark mode
         <div className="dark min-h-screen bg-background text-foreground font-sans flex flex-col">
             <Navbar />
             <main className="flex-grow">
-                {/* 1. Hero */}
+                {/* 1. Hero — full-screen video with CTA */}
                 <HeroSection />
 
-                {/* 2. Gallery / Carousel */}
+                {/* 2. Gallery carousel */}
                 <ImageCarousel />
 
-                {/* Parallax Divider 1 */}
+                {/* Parallax divider 1 */}
                 <ParallaxDivider
-                    imageUrl="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80"
+                    variant="first"
                     height="350px"
                     overlayText="Disconnect to Reconnect"
                     overlaySubtext="Step away from the screens and immerse yourself in the great outdoors."
                 />
 
-                {/* 3. Amenities */}
+                {/* 3. Amenities & features */}
                 <FeaturesSection />
 
-                {/* Parallax Divider 2 */}
+                {/* Parallax divider 2 */}
                 <ParallaxDivider
-                    imageUrl="https://images.unsplash.com/photo-1445307399708-84c4fa616b65?auto=format&fit=crop&w=1920&q=80"
+                    variant="second"
                     height="350px"
                     overlayText="Starlit Nights"
                     overlaySubtext="Experience evenings wrapped in nature's quiet embrace."
                 />
 
-                {/* 4. Reviews */}
+                {/* 4. Testimonials */}
                 <TestimonialsSection />
 
                 {/* 5. Final CTA */}
