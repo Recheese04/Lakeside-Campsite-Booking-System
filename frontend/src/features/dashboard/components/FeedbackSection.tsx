@@ -1,151 +1,250 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Star, MessageSquare, Camera, Send, Tent, UtensilsCrossed,
-    TreePine, ChevronDown, CheckCircle, Clock, Image
+import { 
+    Star, MessageSquare, Tent, Clock, Edit2, 
+    X, CheckCircle, AlertCircle 
 } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import api from '../../../services/api';
 
-const myReviews = [
-    { id: 1, type: 'Campsite', target: 'Hilltop Campsite', booking: 'LCS-20250115', date: 'Jan 18, 2025', rating: 5, comment: 'Amazing views and perfect weather. The bonfire setup was incredible!', status: 'Published', photos: 2 },
-    { id: 2, type: 'Campsite', target: 'Lakefront Deluxe Tent', booking: 'LCS-20241105', date: 'Nov 7, 2024', rating: 4, comment: 'Great lakeside location. The private dock was a nice touch.', status: 'Published', photos: 1 },
-    { id: 3, type: 'Meal', target: 'BBQ Pork Ribs', booking: 'LCS-20250115', date: 'Jan 16, 2025', rating: 5, comment: 'Best ribs I\'ve ever had! Smoky and tender.', status: 'Published', photos: 0 },
-];
-
-const pending = [
-    { id: 1, type: 'Campsite', target: 'Lakefront Deluxe Tent', booking: 'LCS-20250310', checkOut: 'Mar 23, 2025' },
-    { id: 2, type: 'Meal', target: 'Grilled Chicken Platter', booking: 'LCS-20250310', checkOut: 'Mar 23, 2025' },
-];
+const containerVariants = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
+const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
 export default function FeedbackSection() {
-    const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit');
-    const [showSubmitModal, setShowSubmitModal] = useState(false);
-    const [submitType, setSubmitType] = useState('');
-    const [submitTarget, setSubmitTarget] = useState('');
+    const { user } = useAuth();
+    const [activeTab, setActiveTab] = useState<'pending' | 'submitted'>('pending');
+    
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [bookings, setBookings] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedStay, setSelectedStay] = useState<any>(null);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const [reviewsRes, bookingsRes] = await Promise.all([
+                    api.get('/customer/reviews'),
+                    api.get('/customer/bookings'),
+                ]);
+                setReviews(reviewsRes.data);
+                setBookings(bookingsRes.data.filter((b: any) => b.status === 'COMPLETED'));
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, []);
+
+    // A booking is pending format if it's completed and the user hasn't reviewed the campsite yet
+    const pendingStays = bookings.filter(b => !reviews.some(r => r.campsiteId === b.campsiteId));
+    // Unique pending stays by campsite
+    const uniquePending = Array.from(new Map(pendingStays.map(b => [b.campsiteId, b])).values());
+
+    const openReviewModal = (stay: any) => {
+        setSelectedStay(stay);
+        setRating(0);
+        setComment('');
+        setModalOpen(true);
+    };
+
+    const submitFeedback = async () => {
+        if (rating === 0) return;
+        setSubmitting(true);
+        try {
+            const res = await api.post('/customer/reviews', {
+                campsiteId: selectedStay.campsiteId,
+                rating,
+                comment
+            });
+            // Fake the campsite object for the UI update
+            const newReview = {
+                ...res.data,
+                campsite: { name: selectedStay.campsite, images: selectedStay.images }
+            };
+            setReviews(prev => [newReview, ...prev]);
+            setModalOpen(false);
+            setActiveTab('submitted');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to submit review');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loading) return (
+        <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        </div>
+    );
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-4xl">
             <div>
                 <h2 className="text-2xl font-bold text-gray-900">Feedback & Reviews</h2>
-                <p className="text-gray-500 text-sm mt-1">Share your experience and help us improve</p>
+                <p className="text-gray-500 text-sm mt-1">Share your experience and help others plan their trip</p>
             </div>
 
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
-                {[
-                    { id: 'submit' as const, label: 'Submit Review', icon: Star },
-                    { id: 'history' as const, label: 'My Reviews', icon: MessageSquare },
-                ].map(tab => (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-                        <tab.icon className="w-4 h-4" /> {tab.label}
-                    </button>
-                ))}
+            {/* ── Stats ── */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                    <p className="text-2xl font-bold text-gray-900">{reviews.length}</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mt-1">Reviews Submitted</p>
+                </div>
+                <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                    <p className="text-2xl font-bold text-amber-500">{reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '0.0'}</p>
+                    <div className="flex items-center gap-1 mt-1"><Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /><Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /><Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /></div>
+                </div>
+                <div className="bg-gradient-to-br from-green-700 to-emerald-600 text-white rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm col-span-2 md:col-span-1">
+                    <p className="text-2xl font-bold">{uniquePending.length}</p>
+                    <p className="text-xs font-semibold text-white/80 uppercase tracking-wide mt-1">Pending Reviews</p>
+                </div>
             </div>
 
-            {activeTab === 'submit' && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                    <h3 className="font-semibold text-gray-800">Awaiting Your Review</h3>
-                    {pending.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-                            <CheckCircle className="w-10 h-10 text-green-300 mx-auto mb-2" />
-                            <p className="text-gray-400 font-medium">All caught up!</p>
-                            <p className="text-gray-300 text-xs mt-1">No pending reviews at this time.</p>
+            {/* ── Tabs ── */}
+            <div className="flex bg-gray-100 p-1 rounded-xl w-fit">
+                <button onClick={() => setActiveTab('pending')} className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'pending' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                    <AlertCircle className="w-4 h-4" /> To Review {uniquePending.length > 0 && `(${uniquePending.length})`}
+                </button>
+                <button onClick={() => setActiveTab('submitted')} className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'submitted' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                    <CheckCircle className="w-4 h-4" /> Submitted
+                </button>
+            </div>
+
+            {/* ── Pending Review Tab ── */}
+            {activeTab === 'pending' && (
+                <div className="space-y-4">
+                    {uniquePending.length === 0 ? (
+                        <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center">
+                            <CheckCircle className="w-12 h-12 text-green-200 mx-auto mb-3" />
+                            <p className="text-gray-500 font-medium">You're all caught up!</p>
+                            <p className="text-sm text-gray-400 mt-1">No pending stays to review.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {pending.map(item => (
-                                <motion.div key={item.id} whileHover={{ y: -2 }}
-                                    className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <div className={`p-2 rounded-xl ${item.type === 'Campsite' ? 'bg-green-50' : 'bg-amber-50'}`}>
-                                            {item.type === 'Campsite' ? <Tent className="w-4 h-4 text-green-600" /> : <UtensilsCrossed className="w-4 h-4 text-amber-600" />}
+                        uniquePending.map(stay => (
+                            <motion.div key={stay.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row items-center gap-4 hover:shadow-md transition-shadow">
+                                <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50">
+                                    {stay.images?.[0] ? <img src={stay.images[0]} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Tent className="w-8 h-8 text-gray-300" /></div>}
+                                </div>
+                                <div className="flex-1 min-w-0 text-center sm:text-left">
+                                    <h4 className="font-bold text-gray-900">{stay.campsite}</h4>
+                                    <p className="text-xs text-gray-500 mt-0.5">Stayed on {new Date(stay.checkOut).toLocaleDateString()}</p>
+                                    <div className="flex items-center justify-center sm:justify-start gap-1 mt-2 text-gray-200">
+                                        {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4" />)}
+                                    </div>
+                                </div>
+                                <div className="w-full sm:w-auto">
+                                    <button onClick={() => openReviewModal(stay)} className="w-full sm:w-auto px-6 py-2.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-sm font-semibold transition-colors">
+                                        Write Review
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {/* ── Submitted Reviews Tab ── */}
+            {activeTab === 'submitted' && (
+                <div className="space-y-4">
+                    {reviews.length === 0 ? (
+                        <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center">
+                            <MessageSquare className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                            <p className="text-gray-500 font-medium">No reviews submitted yet.</p>
+                        </div>
+                    ) : (
+                        <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {reviews.map(review => (
+                                <motion.div key={review.id} variants={itemVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center gap-3">
+                                            {review.campsite?.images?.[0] ? <img src={review.campsite.images[0]} alt="" className="w-10 h-10 rounded-lg object-cover" /> : <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center"><Tent className="w-5 h-5 text-green-500" /></div>}
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 text-sm leading-tight">{review.campsite?.name || 'Campsite'}</h4>
+                                                <p className="text-xs text-gray-400 mt-0.5">{new Date(review.createdAt).toLocaleDateString()}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-gray-800">{item.target}</p>
-                                            <p className="text-xs text-gray-400">{item.type} · {item.booking}</p>
+                                        <div className="flex items-center gap-1">
+                                            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                            <span className="text-sm font-bold text-gray-700">{review.rating}.0</span>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-gray-400 mb-3"><Clock className="w-3 h-3 inline mr-1" />Available after check-out: {item.checkOut}</p>
-                                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                                        onClick={() => { setShowSubmitModal(true); setSubmitType(item.type); setSubmitTarget(item.target); setRating(0); setComment(''); }}
-                                        className="w-full py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
-                                        <Star className="w-3.5 h-3.5" /> Write Review
-                                    </motion.button>
+                                    <div className="bg-gray-50 rounded-xl p-3 mb-3">
+                                        <p className="text-sm text-gray-600 leading-relaxed italic">"{review.comment || 'No comment provided.'}"</p>
+                                    </div>
+                                    {review.adminResponse && (
+                                        <div className="border-l-2 border-green-500 pl-3 py-1">
+                                            <p className="text-xs font-semibold text-green-700 mb-0.5">Admin Response</p>
+                                            <p className="text-xs text-gray-500">{review.adminResponse}</p>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
-                        </div>
-                    )}
-                </motion.div>
-            )}
-
-            {activeTab === 'history' && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                    {myReviews.map((review, i) => (
-                        <motion.div key={review.id} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
-                            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <div className={`p-2 rounded-xl ${review.type === 'Campsite' ? 'bg-green-50' : 'bg-amber-50'}`}>
-                                        {review.type === 'Campsite' ? <Tent className="w-4 h-4 text-green-600" /> : <UtensilsCrossed className="w-4 h-4 text-amber-600" />}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-800">{review.target}</p>
-                                        <p className="text-xs text-gray-400">{review.type} · {review.date}</p>
-                                    </div>
-                                </div>
-                                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700">{review.status}</span>
-                            </div>
-                            <div className="flex items-center gap-0.5 mb-2">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                    <Star key={s} className={`w-4 h-4 ${s <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
-                                ))}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{review.comment}</p>
-                            {review.photos > 0 && (
-                                <div className="flex items-center gap-1 text-xs text-gray-400">
-                                    <Image className="w-3 h-3" /> {review.photos} photo{review.photos > 1 ? 's' : ''} attached
-                                </div>
-                            )}
                         </motion.div>
-                    ))}
-                </motion.div>
+                    )}
+                </div>
             )}
 
-            {/* Submit Review Modal */}
+            {/* ═══════════ SUBMIT REVIEW MODAL ═══════════ */}
             <AnimatePresence>
-                {showSubmitModal && (
+                {modalOpen && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSubmitModal(false)}>
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setModalOpen(false)}>
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 16 }}
-                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-                            <div className="text-center mb-5">
-                                <div className="w-14 h-14 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                                    <Star className="w-7 h-7 text-amber-500" />
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
+                            <div className="flex justify-between items-center mb-5">
+                                <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2"><Star className="w-5 h-5 text-amber-500" /> Share Your Experience</h3>
+                                <button onClick={() => setModalOpen(false)} className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4" /></button>
+                            </div>
+
+                            <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-5 flex items-center gap-4">
+                                {selectedStay?.images?.[0] ? <img src={selectedStay?.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" /> : <div className="w-12 h-12 bg-gray-200 rounded-lg" />}
+                                <div>
+                                    <h4 className="font-bold text-gray-900">{selectedStay?.campsite}</h4>
+                                    <p className="text-xs text-gray-500 flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" /> Booked on {new Date(selectedStay?.checkIn || '').toLocaleDateString()}</p>
                                 </div>
-                                <h3 className="font-bold text-gray-900 text-lg">Rate & Review</h3>
-                                <p className="text-gray-500 text-xs mt-1">{submitType} · {submitTarget}</p>
                             </div>
-                            <div className="flex items-center justify-center gap-2 mb-5">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                    <motion.button key={s} whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }} onClick={() => setRating(s)} className="focus:outline-none">
-                                        <Star className={`w-9 h-9 transition-colors ${s <= rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
-                                    </motion.button>
-                                ))}
+
+                            <div className="mb-5 text-center">
+                                <p className="text-sm font-semibold text-gray-700 mb-2">How would you rate your stay?</p>
+                                <div className="flex items-center justify-center gap-2">
+                                    {[1, 2, 3, 4, 5].map(star => (
+                                        <motion.button key={star} whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
+                                            onClick={() => setRating(star)} className="focus:outline-none">
+                                            <Star className={`w-10 h-10 transition-colors ${star <= rating ? 'text-amber-400 fill-amber-400 drop-shadow-sm' : 'text-gray-200'}`} />
+                                        </motion.button>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-amber-600 font-medium mt-2 h-4">
+                                    {rating === 1 && 'Poor'}
+                                    {rating === 2 && 'Fair'}
+                                    {rating === 3 && 'Good'}
+                                    {rating === 4 && 'Very Good'}
+                                    {rating === 5 && 'Excellent!'}
+                                </p>
                             </div>
-                            <textarea rows={3} value={comment} onChange={e => setComment(e.target.value)} placeholder="Share your experience..."
-                                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all mb-3" />
-                            <div className="flex items-center gap-2 mb-4">
-                                <button className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-600 hover:border-green-400 transition-colors">
-                                    <Camera className="w-3.5 h-3.5" /> Add Photos
-                                </button>
-                                <span className="text-xs text-gray-400">Max 5 photos or 1 video</span>
+
+                            <div className="mb-6">
+                                <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Review Details</label>
+                                <textarea rows={4} value={comment} onChange={e => setComment(e.target.value)}
+                                    placeholder="What did you like? What could be improved?"
+                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all custom-scrollbar" />
                             </div>
+
                             <div className="flex gap-3">
-                                <button onClick={() => setShowSubmitModal(false)} className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
-                                <button onClick={() => setShowSubmitModal(false)} disabled={rating === 0}
-                                    className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${rating > 0 ? 'text-white bg-amber-500 hover:bg-amber-600' : 'text-gray-400 bg-gray-100 cursor-not-allowed'}`}>
-                                    <Send className="w-3.5 h-3.5" /> Submit
+                                <button onClick={() => setModalOpen(false)} className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
+                                <button onClick={submitFeedback} disabled={rating === 0 || submitting}
+                                    className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 ${rating > 0 && !submitting ? 'text-white bg-green-700 hover:bg-green-800 shadow-md' : 'text-gray-400 bg-gray-100 cursor-not-allowed'}`}>
+                                    {submitting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                                    Submit Feedback
                                 </button>
                             </div>
                         </motion.div>

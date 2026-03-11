@@ -21,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 
 import uploadRoutes from './modules/upload/upload.routes';
+import customerRoutes from './modules/customer/customer.routes';
 import path from 'path';
 
 // ... (existing routes)
@@ -29,6 +30,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/campsites', campsiteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/customer', customerRoutes);
 
 // Serve uploads folder statically so frontend can display images
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
