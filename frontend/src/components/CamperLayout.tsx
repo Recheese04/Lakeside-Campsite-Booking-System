@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, X, Tent, ChevronDown, Bell, Settings, Shield } from 'lucide-react';
+import { LogOut, Menu, X, ChevronDown, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import campsiteLogo from '../images/campsitelogo.png';
 
 interface NavItem {
     id: string;
@@ -47,8 +48,8 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
         <aside className={`${mobile ? 'flex' : 'hidden lg:flex'} flex-col w-72 h-screen bg-gradient-to-b ${theme.sidebar} text-white`}>
             {/* Logo */}
             <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10 flex-shrink-0">
-                <div className="p-2 bg-white/15 rounded-xl">
-                    {isAdmin ? <Shield className="w-5 h-5 text-white" /> : <Tent className="w-5 h-5 text-white" />}
+                <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/15 flex-shrink-0">
+                    <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                 </div>
                 <div>
                     <p className="font-bold text-sm leading-tight">{isAdmin ? 'Lakeside Admin' : 'Lakeside'}</p>
