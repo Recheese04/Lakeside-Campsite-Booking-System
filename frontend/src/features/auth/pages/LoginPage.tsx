@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Tent, Trees, Mountain, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import authimage from '../../../images/caro2.jpg';
 
 const GoogleIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -21,7 +22,6 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [focused, setFocused] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,309 +59,256 @@ const LoginPage: React.FC = () => {
 
     const handleGoogleSignIn = async () => {
         setIsGoogleLoading(true);
-        // Google OAuth logic here
         setTimeout(() => setIsGoogleLoading(false), 2000);
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{
-            background: 'linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)',
-            fontFamily: "'DM Sans', system-ui, sans-serif"
-        }}>
-            {/* Ambient background blobs */}
-            <div style={{
-                position: 'fixed', top: '-10%', right: '-5%',
-                width: '500px', height: '500px', borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
-                pointerEvents: 'none'
-            }} />
-            <div style={{
-                position: 'fixed', bottom: '-10%', left: '-5%',
-                width: '400px', height: '400px', borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)',
-                pointerEvents: 'none'
-            }} />
+        <div className="min-h-screen flex font-['Inter',system-ui,sans-serif]">
+            {/* ═══ LEFT — Hero / Brand Panel ═══ */}
+            <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden">
+                {/* Background image */}
+                <div className="absolute inset-0">
+                    <img
+                        src={authimage}
+                        alt="Lakeside campsite"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-950/80 via-green-900/70 to-emerald-950/80" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 1 }}
-            >
-                {/* Card */}
-                <div style={{
-                    background: 'rgba(255,255,255,0.85)',
-                    backdropFilter: 'blur(24px)',
-                    borderRadius: '24px',
-                    border: '1px solid rgba(99,102,241,0.12)',
-                    boxShadow: '0 8px 40px rgba(99,102,241,0.1), 0 1px 0 rgba(255,255,255,0.9) inset',
-                    padding: '40px',
-                    overflow: 'hidden',
-                    position: 'relative'
-                }}>
-                    {/* Top accent line */}
-                    <div style={{
-                        position: 'absolute', top: 0, left: '10%', right: '10%', height: '2px',
-                        background: 'linear-gradient(90deg, transparent, #6366f1, #8b5cf6, transparent)',
-                        borderRadius: '0 0 4px 4px'
-                    }} />
+                {/* Content on hero */}
+                <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="p-2.5 bg-white/15 backdrop-blur-md rounded-xl border border-white/10 group-hover:bg-white/25 transition-all">
+                            <Tent className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</p>
+                            <p className="text-white/50 text-[11px] font-medium tracking-wide uppercase">Mabini, Bohol</p>
+                        </div>
+                    </Link>
+
+                    {/* Main Message */}
+                    <div className="max-w-lg">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2, duration: 0.6 }}
+                        >
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="h-px w-10 bg-emerald-400/60" />
+                                <span className="text-emerald-300/80 text-xs font-semibold tracking-widest uppercase">Welcome back</span>
+                            </div>
+                            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-[1.15] tracking-tight mb-5" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                Your lakeside<br />escape awaits
+                            </h1>
+                            <p className="text-white/60 text-base leading-relaxed max-w-md">
+                                Sign in to manage your bookings, order meals, and make the most of your campsite experience.
+                            </p>
+                        </motion.div>
+
+                        {/* Feature pills */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.5 }}
+                            className="flex flex-wrap gap-2.5 mt-8"
+                        >
+                            {[
+                                { icon: Trees, label: 'Campsites' },
+                                { icon: Mountain, label: 'Activities' },
+                                { icon: Sparkles, label: 'Amenities' },
+                            ].map(({ icon: Icon, label }) => (
+                                <div key={label} className="flex items-center gap-2 px-3.5 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+                                    <Icon className="w-3.5 h-3.5 text-emerald-300" />
+                                    <span className="text-white/80 text-xs font-medium">{label}</span>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
+
+                    {/* Trust signage */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="flex items-center gap-4"
+                    >
+                        <div className="flex -space-x-2">
+                            {['🏕️', '⛺', '🌲'].map((e, i) => (
+                                <div key={i} className="w-8 h-8 rounded-full bg-white/15 backdrop-blur border-2 border-green-900 flex items-center justify-center text-sm">
+                                    {e}
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <p className="text-white/80 text-xs font-semibold">Trusted by 2,000+ campers</p>
+                            <p className="text-white/40 text-[11px]">⭐ 4.9 rating · Mabini, Bohol</p>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+
+            {/* ═══ RIGHT — Form Panel ═══ */}
+            <div className="flex-1 flex items-center justify-center bg-gray-50 lg:bg-gray-50 px-5 py-10 lg:px-12 relative overflow-y-auto">
+                {/* Mobile background image — visible only below lg */}
+                <div className="absolute inset-0 lg:hidden">
+                    <img
+                        src={authimage}
+                        alt=""
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-green-950/70 via-green-900/60 to-black/80" />
+                </div>
+                {/* Desktop subtle background pattern */}
+                <div className="absolute inset-0 opacity-[0.015] hidden lg:block" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="w-full max-w-[420px] relative z-10 lg:bg-transparent bg-white/95 backdrop-blur-xl lg:backdrop-blur-none rounded-2xl lg:rounded-none p-6 lg:p-0 shadow-2xl lg:shadow-none border border-white/20 lg:border-0"
+                >
+                    {/* Mobile logo */}
+                    <Link to="/" className="lg:hidden flex items-center gap-3 mb-6 justify-center">
+                        <div className="p-2 bg-green-700/20 rounded-xl border border-green-600/30">
+                            <Tent className="w-5 h-5 text-green-700" />
+                        </div>
+                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
+                    </Link>
 
                     {/* Header */}
-                    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 0.1, duration: 0.4 }}
-                            style={{
-                                width: '52px', height: '52px', borderRadius: '16px',
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                margin: '0 auto 20px',
-                                boxShadow: '0 8px 24px rgba(99,102,241,0.35)'
-                            }}
-                        >
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                                <polyline points="10 17 15 12 10 7" />
-                                <line x1="15" y1="12" x2="3" y2="12" />
-                            </svg>
-                        </motion.div>
-                        <h1 style={{
-                            fontSize: '26px', fontWeight: '700', color: '#0f172a',
-                            letterSpacing: '-0.5px', marginBottom: '6px'
-                        }}>Welcome back</h1>
-                        <p style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '400' }}>
-                            Sign in to continue to your account
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            Sign in to your account
+                        </h2>
+                        <p className="text-gray-500 text-sm">
+                            Don't have an account?{' '}
+                            <Link to="/signup" className="text-green-700 font-semibold hover:text-green-800 transition-colors">
+                                Create one free →
+                            </Link>
                         </p>
                     </div>
 
-                    {/* Form */}
-                    <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                            {/* Email Field */}
-                            <div>
-                                <label style={{
-                                    display: 'block', fontSize: '13px', fontWeight: '500',
-                                    color: '#374151', marginBottom: '6px'
-                                }}>Email address</label>
-                                <div style={{ position: 'relative' }}>
-                                    <Mail style={{
-                                        position: 'absolute', left: '14px', top: '50%',
-                                        transform: 'translateY(-50%)', width: '16px', height: '16px',
-                                        color: focused === 'email' ? '#6366f1' : '#94a3b8',
-                                        transition: 'color 0.2s'
-                                    }} />
-                                    <input
-                                        name="email"
-                                        type="email"
-                                        required
-                                        placeholder="you@example.com"
-                                        onChange={handleChange}
-                                        onFocus={() => setFocused('email')}
-                                        onBlur={() => setFocused(null)}
-                                        style={{
-                                            width: '100%', padding: '11px 14px 11px 40px',
-                                            borderRadius: '12px', fontSize: '14px',
-                                            background: focused === 'email' ? '#fff' : '#f8faff',
-                                            border: `1.5px solid ${focused === 'email' ? '#6366f1' : '#e2e8f0'}`,
-                                            color: '#0f172a', outline: 'none',
-                                            transition: 'all 0.2s',
-                                            boxShadow: focused === 'email' ? '0 0 0 3px rgba(99,102,241,0.1)' : 'none',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Password Field */}
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                                    <label style={{ fontSize: '13px', fontWeight: '500', color: '#374151' }}>Password</label>
-                                    <Link to="#" style={{
-                                        fontSize: '12px', color: '#6366f1', fontWeight: '500',
-                                        textDecoration: 'none'
-                                    }}
-                                        onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-                                        onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-                                    >
-                                        Forgot password?
-                                    </Link>
-                                </div>
-                                <div style={{ position: 'relative' }}>
-                                    <Lock style={{
-                                        position: 'absolute', left: '14px', top: '50%',
-                                        transform: 'translateY(-50%)', width: '16px', height: '16px',
-                                        color: focused === 'password' ? '#6366f1' : '#94a3b8',
-                                        transition: 'color 0.2s'
-                                    }} />
-                                    <input
-                                        name="password"
-                                        type={showPassword ? 'text' : 'password'}
-                                        required
-                                        placeholder="••••••••"
-                                        onChange={handleChange}
-                                        onFocus={() => setFocused('password')}
-                                        onBlur={() => setFocused(null)}
-                                        style={{
-                                            width: '100%', padding: '11px 44px 11px 40px',
-                                            borderRadius: '12px', fontSize: '14px',
-                                            background: focused === 'password' ? '#fff' : '#f8faff',
-                                            border: `1.5px solid ${focused === 'password' ? '#6366f1' : '#e2e8f0'}`,
-                                            color: '#0f172a', outline: 'none',
-                                            transition: 'all 0.2s',
-                                            boxShadow: focused === 'password' ? '0 0 0 3px rgba(99,102,241,0.1)' : 'none',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        style={{
-                                            position: 'absolute', right: '12px', top: '50%',
-                                            transform: 'translateY(-50%)', background: 'none',
-                                            border: 'none', cursor: 'pointer', padding: '2px',
-                                            color: '#94a3b8', display: 'flex', alignItems: 'center',
-                                            transition: 'color 0.2s'
-                                        }}
-                                        onMouseEnter={e => (e.currentTarget.style.color = '#6366f1')}
-                                        onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
-                                    >
-                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Error */}
-                            <AnimatePresence>
-                                {error && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -8, height: 0 }}
-                                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                                        exit={{ opacity: 0, y: -8, height: 0 }}
-                                        style={{
-                                            background: '#fef2f2', border: '1px solid #fecaca',
-                                            borderRadius: '10px', padding: '10px 14px',
-                                            fontSize: '13px', color: '#dc2626', textAlign: 'center'
-                                        }}
-                                    >
-                                        {error}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            {/* Submit Button */}
-                            <motion.button
-                                type="submit"
-                                disabled={isLoading}
-                                whileHover={{ scale: isLoading ? 1 : 1.01 }}
-                                whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                                style={{
-                                    width: '100%', padding: '13px',
-                                    background: isLoading
-                                        ? 'linear-gradient(135deg, #a5b4fc, #c4b5fd)'
-                                        : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                    border: 'none', borderRadius: '12px',
-                                    color: '#fff', fontSize: '14px', fontWeight: '600',
-                                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                    boxShadow: '0 4px 16px rgba(99,102,241,0.35)',
-                                    transition: 'all 0.2s', letterSpacing: '0.01em'
-                                }}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <div style={{
-                                            width: '16px', height: '16px',
-                                            border: '2px solid rgba(255,255,255,0.4)',
-                                            borderTopColor: '#fff', borderRadius: '50%',
-                                            animation: 'spin 0.7s linear infinite'
-                                        }} />
-                                        Signing in...
-                                    </>
-                                ) : (
-                                    <>
-                                        Sign In
-                                        <ArrowRight size={16} />
-                                    </>
-                                )}
-                            </motion.button>
-                        </div>
-                    </form>
-
-                    {/* Divider */}
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: '12px',
-                        margin: '24px 0'
-                    }}>
-                        <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-                        <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '500', whiteSpace: 'nowrap' }}>
-                            or continue with
-                        </span>
-                        <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-                    </div>
-
-                    {/* Google Sign In */}
+                    {/* Google Button */}
                     <motion.button
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={isGoogleLoading}
-                        whileHover={{ scale: isGoogleLoading ? 1 : 1.01 }}
-                        whileTap={{ scale: isGoogleLoading ? 1 : 0.98 }}
-                        style={{
-                            width: '100%', padding: '12px',
-                            background: '#fff', border: '1.5px solid #e2e8f0',
-                            borderRadius: '12px', cursor: isGoogleLoading ? 'not-allowed' : 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                            fontSize: '14px', fontWeight: '600', color: '#374151',
-                            transition: 'all 0.2s',
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
-                        }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.borderColor = '#6366f1';
-                            e.currentTarget.style.boxShadow = '0 2px 12px rgba(99,102,241,0.12)';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.borderColor = '#e2e8f0';
-                            e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
-                        }}
+                        whileHover={{ scale: 1.005 }}
+                        whileTap={{ scale: 0.995 }}
+                        className="w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm hover:shadow transition-all disabled:opacity-50"
                     >
                         {isGoogleLoading ? (
-                            <div style={{
-                                width: '16px', height: '16px',
-                                border: '2px solid #e2e8f0',
-                                borderTopColor: '#6366f1', borderRadius: '50%',
-                                animation: 'spin 0.7s linear infinite'
-                            }} />
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-green-600 rounded-full animate-spin" />
                         ) : (
                             <GoogleIcon />
                         )}
-                        {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
+                        {isGoogleLoading ? 'Connecting…' : 'Continue with Google'}
                     </motion.button>
 
-                    {/* Footer */}
-                    <p style={{
-                        textAlign: 'center', marginTop: '24px',
-                        fontSize: '13px', color: '#94a3b8'
-                    }}>
-                        Don't have an account?{' '}
-                        <Link to="/signup" style={{
-                            color: '#6366f1', fontWeight: '600', textDecoration: 'none'
-                        }}
-                            onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-                            onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-                        >
-                            Create one free
-                        </Link>
-                    </p>
-                </div>
-            </motion.div>
+                    {/* Divider */}
+                    <div className="flex items-center gap-3 my-6">
+                        <div className="flex-1 h-px bg-gray-200" />
+                        <span className="text-xs text-gray-400 font-medium">or sign in with email</span>
+                        <div className="flex-1 h-px bg-gray-200" />
+                    </div>
 
-            <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
-                * { box-sizing: border-box; }
-                input::placeholder { color: #cbd5e1; }
-            `}</style>
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* Email */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    name="email"
+                                    type="email"
+                                    required
+                                    placeholder="you@example.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all shadow-sm"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="text-sm font-medium text-gray-700">Password</label>
+                                <Link to="#" className="text-xs text-green-700 font-medium hover:text-green-800 transition-colors">
+                                    Forgot password?
+                                </Link>
+                            </div>
+                            <div className="relative">
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    required
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full pl-10 pr-11 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all shadow-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Error */}
+                        <AnimatePresence>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -6, height: 0 }}
+                                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                                    exit={{ opacity: 0, y: -6, height: 0 }}
+                                    className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600 text-center"
+                                >
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Submit */}
+                        <motion.button
+                            type="submit"
+                            disabled={isLoading}
+                            whileHover={{ scale: isLoading ? 1 : 1.005 }}
+                            whileTap={{ scale: isLoading ? 1 : 0.995 }}
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold rounded-xl shadow-md shadow-green-700/25 hover:shadow-lg hover:shadow-green-700/30 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Signing in…
+                                </>
+                            ) : (
+                                <>
+                                    Sign In
+                                    <ArrowRight className="w-4 h-4" />
+                                </>
+                            )}
+                        </motion.button>
+                    </form>
+
+                    {/* Footer */}
+                    <p className="text-center text-xs text-gray-400 mt-8">
+                        By continuing, you agree to our{' '}
+                        <a href="#" className="text-gray-500 hover:text-green-700 underline underline-offset-2">Terms</a>{' '}
+                        and{' '}
+                        <a href="#" className="text-gray-500 hover:text-green-700 underline underline-offset-2">Privacy Policy</a>
+                    </p>
+                </motion.div>
+            </div>
         </div>
     );
 };
