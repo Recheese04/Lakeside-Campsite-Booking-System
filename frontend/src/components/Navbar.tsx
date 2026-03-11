@@ -1,8 +1,9 @@
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Tent, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import campsiteLogo from '../images/campsitelogo.png';
 
 export const Navbar = () => {
     const { scrollY } = useScroll();
@@ -23,8 +24,8 @@ export const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2 cursor-pointer">
-                    <div className={`p-2 rounded-xl bg-primary text-primary-foreground`}>
-                        <Tent className="h-5 w-5" />
+                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary">
+                        <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                     </div>
                     <span className={`text-xl font-bold tracking-tight ${isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'}`}>
                         Lakeside

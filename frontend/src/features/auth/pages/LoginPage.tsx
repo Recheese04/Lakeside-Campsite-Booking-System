@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
                 <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/15 backdrop-blur-md border border-white/10 group-hover:bg-white/25 transition-all">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/15 backdrop-blur-md border border-white/10 group-hover:bg-white/25 transition-all">
                             <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
                         <div>
@@ -180,7 +180,7 @@ const LoginPage: React.FC = () => {
                 >
                     {/* Mobile logo */}
                     <Link to="/" className="lg:hidden flex items-center gap-3 mb-6 justify-center">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-green-700/20 border border-green-600/30">
+                        <div className="w-11 h-11 rounded-xl overflow-hidden bg-green-700/20 border border-green-600/30">
                             <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
                         <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
