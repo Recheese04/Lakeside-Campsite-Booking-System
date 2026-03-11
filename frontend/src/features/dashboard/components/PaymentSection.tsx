@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { StatCardSkeleton, TableRowSkeleton } from '../../../components/Skeleton';
 import { 
     CreditCard, DollarSign, Download, Clock, CheckCircle, AlertCircle, X, MapPin 
 } from 'lucide-react';
@@ -39,8 +40,9 @@ export default function PaymentSection() {
     const pendingAmount = bookings.filter(b => b.paymentStatus === 'UNPAID' && b.status !== 'CANCELLED').reduce((sum, b) => sum + Number(b.totalPrice), 0);
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6 max-w-4xl">
+            <StatCardSkeleton count={3} />
+            <TableRowSkeleton cols={5} rows={4} />
         </div>
     );
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Skeleton } from '../../../components/Skeleton';
 import {
     User, Mail, Phone, Camera, Save, Edit2, Lock,
     Shield, Bell, CheckCircle, AlertTriangle, X, Star, CalendarDays
@@ -75,8 +76,24 @@ export default function ProfileSection() {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6 max-w-3xl">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-5">
+                <Skeleton className="w-20 h-20 rounded-full" />
+                <div className="flex-1 space-y-3">
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-56" />
+                    <div className="flex gap-4"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-20" /></div>
+                </div>
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+                <Skeleton className="h-5 w-32" />
+                <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-10 w-full rounded-xl" />
+                    <Skeleton className="h-10 w-full rounded-xl" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-xl" />
+                <Skeleton className="h-10 w-32 rounded-xl" />
+            </div>
         </div>
     );
 

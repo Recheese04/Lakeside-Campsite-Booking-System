@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SearchSkeleton, TableRowSkeleton } from '../../../components/Skeleton';
 import {
     Search, Filter, Eye, X, QrCode, MapPin, Users, CalendarDays,
     Download, AlertTriangle, CheckCircle, Clock, Phone, Mail,
@@ -81,8 +82,9 @@ export default function MyBookings() {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6">
+            <SearchSkeleton />
+            <TableRowSkeleton cols={7} rows={5} />
         </div>
     );
 

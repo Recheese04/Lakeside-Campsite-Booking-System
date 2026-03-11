@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Menu, X, ChevronDown, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import campsiteLogo from '../images/campsitelogo.png';
 
 interface NavItem {
@@ -25,6 +26,16 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (variant === 'user') {
+            api.get('/customer/notifications').then(res => {
+                const unread = res.data.filter((n: any) => !n.isRead).length;
+                setUnreadCount(unread);
+            }).catch(() => {});
+        }
+    }, [activeSection, variant]);
 
     const handleLogout = () => {
         setLoggingOut(true);
@@ -97,8 +108,8 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                         {activeSection === id && (
                             <motion.div layoutId={`${variant}ActiveDot`} className={`ml-auto w-1.5 h-1.5 ${theme.accent} rounded-full flex-shrink-0`} />
                         )}
-                        {id === 'notifications' && (
-                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">3</span>
+                        {id === 'notifications' && unreadCount > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">{unreadCount}</span>
                         )}
                     </button>
                 ))}

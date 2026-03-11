@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { StatCardSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 import { 
-    Star, MessageSquare, Tent, Clock, Edit2, 
+    Star, MessageSquare, Tent, Clock, Edit2, CalendarDays,
     X, CheckCircle, AlertCircle 
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
@@ -80,8 +81,9 @@ export default function FeedbackSection() {
     };
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6 max-w-4xl">
+            <StatCardSkeleton count={3} />
+            <ListItemSkeleton rows={4} />
         </div>
     );
 

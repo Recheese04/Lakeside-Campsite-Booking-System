@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BannerSkeleton, StatCardSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 import {
     CalendarDays, Moon, DollarSign, TrendingUp, ArrowRight, Tent, MapPin,
     Clock, Star, CloudSun, Thermometer, Droplets, Wind, Bell,
@@ -59,8 +60,13 @@ export default function DashboardOverview() {
     ] : [];
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6">
+            <BannerSkeleton />
+            <StatCardSkeleton count={4} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <ListItemSkeleton rows={3} />
+                <ListItemSkeleton rows={3} />
+            </div>
         </div>
     );
 

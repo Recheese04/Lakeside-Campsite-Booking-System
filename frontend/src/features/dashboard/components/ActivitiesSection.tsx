@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { ListItemSkeleton } from '../../../components/Skeleton';
 import {
     TreePine, Tent, Clock, Users, Star, CheckCircle, AlertCircle, ChevronRight
 } from 'lucide-react';
@@ -33,8 +34,9 @@ export default function ActivitiesSection() {
     }, []);
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6">
+            <ListItemSkeleton rows={4} />
+            <ListItemSkeleton rows={3} />
         </div>
     );
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { SearchSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 import { 
     Bell, CheckCircle, Info, DollarSign, Clock, Settings, AlertTriangle, 
     Trash2, Search, Filter 
@@ -77,8 +78,9 @@ export default function NotificationsSection() {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <div className="space-y-6 max-w-4xl">
+            <SearchSkeleton />
+            <ListItemSkeleton rows={5} />
         </div>
     );
 
