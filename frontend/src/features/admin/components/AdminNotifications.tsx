@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, Send, Users, Calendar, DollarSign, UtensilsCrossed, Clock, Megaphone, Loader2 } from 'lucide-react';
 import api from '../../../services/api';
+import { ListItemSkeleton } from '../../../components/Skeleton';
 
 interface Notification {
     id: string;
@@ -56,7 +57,7 @@ export default function AdminNotifications() {
         } finally { setSending(false); }
     };
 
-    if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-green-600 animate-spin" /></div>;
+    if (loading) return (<div className="space-y-6"><ListItemSkeleton rows={5} /></div>);
     if (error && tab === 'history') return <div className="text-center py-20"><p className="text-red-500 font-medium">{error}</p><button onClick={fetchNotifications} className="mt-3 text-sm text-green-700 underline">Retry</button></div>;
 
     return (

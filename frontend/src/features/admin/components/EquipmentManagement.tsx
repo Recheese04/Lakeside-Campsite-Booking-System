@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, Plus, Edit2, Trash2, Users, Calendar, TreePine, Loader2, X, Save } from 'lucide-react';
 import api from '../../../services/api';
+import { ListItemSkeleton } from '../../../components/Skeleton';
 
 interface Equipment {
     id: string;
@@ -90,7 +91,7 @@ export default function EquipmentManagement() {
     const handleDeleteEquipment = async (id: string) => { if (!confirm('Delete this equipment?')) return; try { await api.delete(`/admin/equipment/${id}`); await fetchData(); } catch (err: any) { alert(err.response?.data?.error || 'Failed to delete'); } };
     const handleDeleteActivity = async (id: string) => { if (!confirm('Delete this activity?')) return; try { await api.delete(`/admin/activities/${id}`); await fetchData(); } catch (err: any) { alert(err.response?.data?.error || 'Failed to delete'); } };
 
-    if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-green-600 animate-spin" /></div>;
+    if (loading) return (<div className="space-y-6"><ListItemSkeleton rows={4} /><ListItemSkeleton rows={3} /></div>);
     if (error) return <div className="text-center py-20"><p className="text-red-500 font-medium">{error}</p><button onClick={fetchData} className="mt-3 text-sm text-green-700 underline">Retry</button></div>;
 
     return (

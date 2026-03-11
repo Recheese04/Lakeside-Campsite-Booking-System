@@ -6,6 +6,7 @@ import {
     TrendingUp, ArrowUpRight, LogIn, Loader2
 } from 'lucide-react';
 import api from '../../../services/api';
+import { BannerSkeleton, StatCardSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 
 interface DashboardStats {
     totalBookings: number;
@@ -74,8 +75,13 @@ export default function AdminOverview() {
     }, []);
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+        <div className="space-y-6">
+            <BannerSkeleton />
+            <StatCardSkeleton count={4} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <ListItemSkeleton rows={4} />
+                <ListItemSkeleton rows={4} />
+            </div>
         </div>
     );
 

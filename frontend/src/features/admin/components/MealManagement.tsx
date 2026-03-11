@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UtensilsCrossed, Plus, Edit2, Trash2, X, Clock, DollarSign, TrendingUp, Search, Loader2, Save } from 'lucide-react';
 import api from '../../../services/api';
+import { SearchSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 
 interface MenuItem {
     id: string;
@@ -99,7 +100,7 @@ export default function MealManagement() {
 
     const filtered = menuItems.filter(m => m.name.toLowerCase().includes(search.toLowerCase()));
 
-    if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-green-600 animate-spin" /></div>;
+    if (loading) return (<div className="space-y-6"><SearchSkeleton /><ListItemSkeleton rows={5} /><ListItemSkeleton rows={3} /></div>);
     if (error) return <div className="text-center py-20"><p className="text-red-500 font-medium">{error}</p><button onClick={fetchData} className="mt-3 text-sm text-green-700 underline">Retry</button></div>;
 
     return (

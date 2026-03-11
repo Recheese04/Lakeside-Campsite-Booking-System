@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarDays, Search, Filter, DollarSign, Eye, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import api from '../../../services/api';
+import { StatCardSkeleton, SearchSkeleton, TableRowSkeleton } from '../../../components/Skeleton';
 
 interface Booking {
     id: string;
@@ -67,7 +68,7 @@ export default function BookingManagement() {
         return ms && mf;
     });
 
-    if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-green-600 animate-spin" /></div>;
+    if (loading) return (<div className="space-y-6"><StatCardSkeleton count={4} /><SearchSkeleton /><TableRowSkeleton cols={6} rows={5} /></div>);
     if (error) return <div className="text-center py-20"><p className="text-red-500 font-medium">{error}</p><button onClick={fetchData} className="mt-3 text-sm text-green-700 underline">Retry</button></div>;
 
     const totalRev = Number(revenue?.totalRevenue || 0);

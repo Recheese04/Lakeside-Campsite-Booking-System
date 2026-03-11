@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Eye, Ban, Mail, Shield, Loader2, CheckCircle } from 'lucide-react';
 import api from '../../../services/api';
+import { StatCardSkeleton, TableRowSkeleton, SearchSkeleton } from '../../../components/Skeleton';
 
 interface User {
     id: string;
@@ -71,8 +72,10 @@ export default function UserManagement() {
     );
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+        <div className="space-y-6">
+            <StatCardSkeleton count={3} />
+            <SearchSkeleton />
+            <TableRowSkeleton cols={5} rows={6} />
         </div>
     );
 

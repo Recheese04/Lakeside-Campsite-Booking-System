@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, MessageSquare, Tent, UtensilsCrossed, TreePine, Loader2, X, Send } from 'lucide-react';
 import api from '../../../services/api';
+import { StatCardSkeleton, ListItemSkeleton } from '../../../components/Skeleton';
 
 interface Review {
     id: string;
@@ -56,7 +57,7 @@ export default function AdminFeedback() {
         } finally { setSending(false); }
     };
 
-    if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-green-600 animate-spin" /></div>;
+    if (loading) return (<div className="space-y-6"><StatCardSkeleton count={3} /><ListItemSkeleton rows={4} /></div>);
     if (error) return <div className="text-center py-20"><p className="text-red-500 font-medium">{error}</p><button onClick={fetchFeedback} className="mt-3 text-sm text-green-700 underline">Retry</button></div>;
 
     const respondedCount = reviews.filter(r => r.adminResponse).length;

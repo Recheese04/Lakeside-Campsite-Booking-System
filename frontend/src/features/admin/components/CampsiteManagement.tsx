@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tent, Plus, Edit2, Trash2, X, Calendar, Eye, Users, Search, LogIn, LogOut as LogOutIcon, Loader2, Save } from 'lucide-react';
 import api from '../../../services/api';
+import { SearchSkeleton, TableRowSkeleton } from '../../../components/Skeleton';
 
 interface Campsite {
     id: string;
@@ -108,8 +109,9 @@ export default function CampsiteManagement() {
     const filtered = campsites.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
     if (loading) return (
-        <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+        <div className="space-y-6">
+            <SearchSkeleton />
+            <TableRowSkeleton cols={6} rows={5} />
         </div>
     );
 
