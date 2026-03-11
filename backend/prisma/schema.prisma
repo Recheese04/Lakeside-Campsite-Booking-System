@@ -30,12 +30,14 @@ model User {
   avatarUrl   String?
   role        Role      @default(CUSTOMER)
   isVerified  Boolean   @default(false)
+  isBanned    Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // Relations
   bookings    Booking[]
   reviews     Review[]
+  mealOrders  MealOrder[]
 
   @@map("users")
 }
@@ -167,17 +169,104 @@ model Payment {
 // ====================================
 
 model Review {
-  id          String    @id @default(cuid())
-  userId      String
-  campsiteId  String
-  rating      Int       // 1–5
-  comment     String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  userId        String
+  campsiteId    String
+  rating        Int       // 1–5
+  comment       String?
+  adminResponse String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   campsite    Campsite  @relation(fields: [campsiteId], references: [id])
 
   @@unique([userId, campsiteId])  // One review per user per campsite
   @@map("reviews")
+}
+
+// ====================================
+// NOTIFICATIONS
+// ====================================
+
+model Notification {
+  id          String    @id @default(cuid())
+  title       String
+  message     String
+  type        String    @default("General") // General, Payment, Booking, Meal, System
+  recipientId String?   // null = broadcast to all users
+  sentById    String?
+  isRead      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  @@map("notifications")
+}
+
+// ====================================
+// MEALS / RESTAURANT
+// ====================================
+
+enum MealCategory {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  DRINK
+}
+
+model MealItem {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal      @db.Decimal(10, 2)
+  category    MealCategory @default(LUNCH)
+  imageUrl    String?
+  available   Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("meal_items")
+}
+
+enum MealOrderStatus {
+  PENDING
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+model MealOrder {
+  id           String          @id @default(cuid())
+  userId       String
+  items        Json            // [{mealItemId, name, quantity, price}]
+  totalPrice   Decimal         @db.Decimal(10, 2)
+  status       MealOrderStatus @default(PENDING)
+  deliveryTime DateTime?
+  notes        String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("meal_orders")
+}
+
+// ====================================
+// ACTIVITIES
+// ====================================
+
+model Activity {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  capacity    Int       @default(10)
+  schedule    String?   // e.g. "Daily 8AM-5PM"
+  available   Boolean   @default(true)
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("activities")
 }

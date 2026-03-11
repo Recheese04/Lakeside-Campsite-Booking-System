@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, X, Tent, ChevronDown, Bell, Settings, Shield, LayoutDashboard } from 'lucide-react';
+import { LogOut, Menu, X, Tent, ChevronDown, Bell, Settings, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -92,11 +92,6 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
 
             {/* Bottom actions */}
             <div className="px-3 py-3 border-t border-white/10 flex-shrink-0 space-y-1">
-                {isAdmin && (
-                    <button onClick={() => navigate('/dashboard')} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition-all">
-                        <LayoutDashboard className="w-4 h-4" /> User Dashboard
-                    </button>
-                )}
                 <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200">
                     <LogOut className="w-4 h-4" /> Log Out
                 </button>
