@@ -1,14 +1,27 @@
-import { motion } from 'framer-motion';
+/* ── Inject shimmer keyframes once ── */
+const shimmerStyle = document.createElement('style');
+shimmerStyle.textContent = `
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+`;
+if (!document.head.querySelector('[data-skeleton-shimmer]')) {
+    shimmerStyle.setAttribute('data-skeleton-shimmer', '');
+    document.head.appendChild(shimmerStyle);
+}
 
 /* ── Base shimmer block ── */
 export const Skeleton = ({ className = '', style }: { className?: string; style?: React.CSSProperties }) => (
-    <div className={`relative overflow-hidden bg-gray-100 rounded-xl ${className}`} style={style}>
-        <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"
-            animate={{ x: ['-100%', '100%'] }}
-            transition={{ repeat: Infinity, duration: 1.4, ease: 'linear' }}
-        />
-    </div>
+    <div
+        className={`rounded-xl ${className}`}
+        style={{
+            background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%)',
+            backgroundSize: '200% 100%',
+            animation: 'skeleton-shimmer 1.5s ease-in-out infinite',
+            ...style,
+        }}
+    />
 );
 
 /* ── Preset skeletons for common admin layouts ── */
