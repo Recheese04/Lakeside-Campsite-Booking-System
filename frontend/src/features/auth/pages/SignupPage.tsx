@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Phone, ArrowRight, User, Eye, EyeOff, Tent, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import api from '../../../services/api';
 import authimage from '../../../images/caro2.jpg';
 
 const GoogleIcon = () => (
@@ -35,25 +36,18 @@ const SignupPage: React.FC = () => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            const data = await response.json();
-            if (response.ok) {
-                login(data.token, data.user);
-                // Redirect based on role
-                if (data.user.role === 'ADMIN') {
-                    navigate('/admin');
-                } else {
-                    navigate('/dashboard');
-                }
+            const response = await api.post('/auth/register', formData);
+            const data = response.data;
+            
+            login(data.token, data.user);
+            // Redirect based on role
+            if (data.user.role === 'ADMIN') {
+                navigate('/admin');
             } else {
-                setError(data.error || 'Signup failed. Please try again.');
+                navigate('/dashboard');
             }
-        } catch {
-            setError('Unable to connect. Please try again.');
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Signup failed. Please try again.');
         } finally {
             setIsLoading(false);
         }

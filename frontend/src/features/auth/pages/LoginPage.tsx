@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff, Tent, Trees, Mountain, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Trees, Mountain, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import api from '../../../services/api';
 import authimage from '../../../images/caro2.jpg';
 import campsiteLogo from '../../../images/campsitelogo.png';
 
@@ -36,29 +37,23 @@ const LoginPage: React.FC = () => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            const data = await response.json();
-            if (response.ok) {
-                login(data.token, data.user);
-                setLoggedInUser(data.user);
-                setShowSuccess(true);
-                // Navigate after showing success modal
-                setTimeout(() => {
-                    if (data.user.role === 'ADMIN') {
-                        navigate('/admin');
-                    } else {
-                        navigate('/dashboard');
-                    }
-                }, 1800);
-            } else {
-                setError(data.error || 'Login failed. Please try again.');
-            }
-        } catch {
-            setError('Unable to connect. Please try again.');
+            const response = await api.post('/auth/login', formData);
+            const data = response.data;
+            
+            login(data.token, data.user);
+            setLoggedInUser(data.user);
+            setShowSuccess(true);
+            
+            // Navigate after showing success modal
+            setTimeout(() => {
+                if (data.user.role === 'ADMIN') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
+            }, 1800);
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Login failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
