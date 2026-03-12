@@ -24,6 +24,11 @@ import uploadRoutes from './modules/upload/upload.routes';
 import customerRoutes from './modules/customer/customer.routes';
 import path from 'path';
 
+// Health Check for UptimeRobot (Keeps Render instance awake)
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 // ... (existing routes)
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
