@@ -137,7 +137,7 @@ export const HeroSection = () => {
     const textY = useTransform(scrollYProgress, [0, 0.55], [0, -100]);
 
     return (
-        <section ref={ref} className="relative h-screen min-h-[750px] w-full flex items-end overflow-hidden">
+        <section ref={ref} className="relative h-screen min-h-[750px] w-full flex items-start sm:items-end overflow-hidden">
             {/* ── Video background ── */}
             <motion.div className="absolute inset-0 z-0 scale-110" style={{ y: bgY }}>
                 <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
@@ -178,7 +178,7 @@ export const HeroSection = () => {
 
             {/* ── Content ── */}
             <motion.div
-                className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 pb-32 sm:pb-24 md:pb-32"
+                className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 pt-24 sm:pt-0 sm:pb-24 md:pb-32"
                 style={{ opacity: textOpacity, y: textY }}
             >
                 {/* Location badge */}
