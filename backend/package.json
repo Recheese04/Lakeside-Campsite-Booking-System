@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "db-test": "ts-node src/db-test.ts",
+    "seed": "ts-node src/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",

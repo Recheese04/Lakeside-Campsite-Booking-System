@@ -104,6 +104,11 @@ export const login = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Login error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        // Expose error for debugging Render DB issues
+        res.status(500).json({ 
+            error: 'Internal server error', 
+            details: error.message,
+            code: error.code // Prisma error codes (e.g., P2002) are very helpful
+        });
     }
 };
