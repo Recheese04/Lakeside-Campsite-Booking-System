@@ -1,6 +1,8 @@
 import multer from 'multer';
+import 'multer';
 import path from 'path';
 import fs from 'fs';
+import { Request } from 'express';
 
 // Ensure uploads directory exists
 const uploadDir = path.join(process.cwd(), 'uploads');

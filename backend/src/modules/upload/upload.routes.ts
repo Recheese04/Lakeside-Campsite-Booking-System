@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import 'multer';
 import { upload } from '../../middleware/upload.middleware';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
 
