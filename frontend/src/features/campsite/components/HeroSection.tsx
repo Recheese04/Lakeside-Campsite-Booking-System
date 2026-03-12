@@ -137,7 +137,7 @@ export const HeroSection = () => {
     const textY = useTransform(scrollYProgress, [0, 0.55], [0, -100]);
 
     return (
-        <section ref={ref} className="relative h-screen min-h-[750px] w-full flex items-start sm:items-end overflow-hidden">
+        <section ref={ref} className="relative h-screen min-h-[750px] w-full flex items-center sm:items-end overflow-hidden">
             {/* ── Video background ── */}
             <motion.div className="absolute inset-0 z-0 scale-110" style={{ y: bgY }}>
                 <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
