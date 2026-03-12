@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, X, Tent, ChevronDown, Bell, Settings, Shield, LayoutDashboard } from 'lucide-react';
+import { LogOut, Menu, X, ChevronDown, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import campsiteLogo from '../images/campsitelogo.png';
 
 interface NavItem {
     id: string;
@@ -22,8 +24,26 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
     const [activeSection, setActiveSection] = useState(navItems[0]?.id ?? 'overview');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
 
-    const handleLogout = () => { logout(); navigate('/'); };
+    useEffect(() => {
+        if (variant === 'user') {
+            api.get('/customer/notifications').then(res => {
+                const unread = res.data.filter((n: any) => !n.isRead).length;
+                setUnreadCount(unread);
+            }).catch(() => {});
+        }
+    }, [activeSection, variant]);
+
+    const handleLogout = () => {
+        setLoggingOut(true);
+        setTimeout(() => {
+            logout();
+            navigate('/');
+        }, 1500);
+    };
 
     const isAdmin = variant === 'admin';
     const initials = user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : (isAdmin ? 'A' : 'U');
@@ -39,11 +59,16 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
         <aside className={`${mobile ? 'flex' : 'hidden lg:flex'} flex-col w-72 h-screen bg-gradient-to-b ${theme.sidebar} text-white`}>
             {/* Logo */}
             <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10 flex-shrink-0">
-                <div className="p-2 bg-white/15 rounded-xl">
-                    {isAdmin ? <Shield className="w-5 h-5 text-white" /> : <Tent className="w-5 h-5 text-white" />}
+                <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/15 flex-shrink-0">
+                    <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                    <p className="font-bold text-sm leading-tight">{isAdmin ? 'Lakeside Admin' : 'Lakeside'}</p>
+                    <p className="font-bold text-sm leading-tight">
+                        {isAdmin ? 
+                            <span>Lakeside <span className="text-emerald-400">Admin</span></span> : 
+                            <span>Lakeside <span className="text-emerald-400">Campsite</span></span>
+                        }
+                    </p>
                     <p className="text-white/60 text-xs">{isAdmin ? 'Control Panel' : 'Mabini, Bohol'}</p>
                 </div>
                 {mobile && (
@@ -83,8 +108,8 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                         {activeSection === id && (
                             <motion.div layoutId={`${variant}ActiveDot`} className={`ml-auto w-1.5 h-1.5 ${theme.accent} rounded-full flex-shrink-0`} />
                         )}
-                        {id === 'notifications' && (
-                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">3</span>
+                        {id === 'notifications' && unreadCount > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">{unreadCount}</span>
                         )}
                     </button>
                 ))}
@@ -92,12 +117,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
 
             {/* Bottom actions */}
             <div className="px-3 py-3 border-t border-white/10 flex-shrink-0 space-y-1">
-                {isAdmin && (
-                    <button onClick={() => navigate('/dashboard')} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition-all">
-                        <LayoutDashboard className="w-4 h-4" /> User Dashboard
-                    </button>
-                )}
-                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200">
+                <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200">
                     <LogOut className="w-4 h-4" /> Log Out
                 </button>
             </div>
@@ -190,7 +210,7 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                                                 <Settings className="w-4 h-4" /> {isAdmin ? 'User Dashboard' : 'Settings'}
                                             </button>
                                             <button
-                                                onClick={handleLogout}
+                                                onClick={() => { setProfileMenuOpen(false); setShowLogoutModal(true); }}
                                                 className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                             >
                                                 <LogOut className="w-4 h-4" /> Log Out
@@ -232,6 +252,65 @@ export default function CamperLayout({ navItems, sectionComponents, variant = 'u
                     </footer>
                 </main>
             </div>
+
+            {/* ═══ Logout Confirmation Modal ═══ */}
+            <AnimatePresence>
+                {showLogoutModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+                        onClick={() => !loggingOut && setShowLogoutModal(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+                            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {loggingOut ? (
+                                /* ── Logging out animation ── */
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                >
+                                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <div className="w-6 h-6 border-[2.5px] border-red-200 border-t-red-500 rounded-full animate-spin" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-800 mb-1">Logging out...</p>
+                                    <p className="text-xs text-gray-400">See you next time!</p>
+                                </motion.div>
+                            ) : (
+                                /* ── Confirmation prompt ── */
+                                <>
+                                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <LogOut className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1">Log Out</h3>
+                                    <p className="text-sm text-gray-500 mb-6">Are you sure you want to log out of your account?</p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowLogoutModal(false)}
+                                            className="flex-1 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex-1 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                                        >
+                                            <LogOut className="w-3.5 h-3.5" /> Log Out
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

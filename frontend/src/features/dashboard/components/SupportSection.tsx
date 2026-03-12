@@ -69,9 +69,15 @@ export default function SupportSection() {
                         className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all"
                     />
                     <motion.button
+                        onClick={() => {
+                            if (!message) return;
+                            alert('Thank you for reaching out! Our team will get back to you shortly.');
+                            setMessage('');
+                        }}
+                        disabled={!message}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-semibold transition-colors"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Send className="w-4 h-4" /> Send Message
                     </motion.button>

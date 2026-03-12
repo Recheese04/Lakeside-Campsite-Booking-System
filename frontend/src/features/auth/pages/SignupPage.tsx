@@ -100,7 +100,9 @@ const SignupPage: React.FC = () => {
                             <Tent className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</p>
+                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                Lakeside <span className="text-emerald-400">Campsite</span>
+                            </p>
                             <p className="text-white/50 text-[11px] font-medium tracking-wide uppercase">Mabini, Bohol</p>
                         </div>
                     </Link>
@@ -191,7 +193,9 @@ const SignupPage: React.FC = () => {
                         <div className="p-2 bg-green-700/20 rounded-xl border border-green-600/30">
                             <Tent className="w-5 h-5 text-green-700" />
                         </div>
-                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
+                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            Lakeside <span className="text-emerald-500">Campsite</span>
+                        </span>
                     </Link>
 
                     {/* Header */}

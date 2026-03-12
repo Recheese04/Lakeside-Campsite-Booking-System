@@ -3,7 +3,16 @@ import { useAuth } from '../context/AuthContext';
 import type { ReactNode } from 'react';
 
 export const ProtectedRoute = ({ children, requiredRole }: { children: ReactNode, requiredRole?: string }) => {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, loading } = useAuth();
+
+    // Wait for auth state to load from localStorage before deciding
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="w-8 h-8 border-3 border-green-200 border-t-green-600 rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     if (!isAuthenticated) return <Navigate to="/login" replace />;
 

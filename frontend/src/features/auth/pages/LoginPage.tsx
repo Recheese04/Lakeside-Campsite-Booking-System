@@ -7,6 +7,7 @@ import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 >>>>>>>>> Temporary merge branch 2
 import { useAuth } from '../../../context/AuthContext';
 import authimage from '../../../images/caro2.jpg';
+import campsiteLogo from '../../../images/campsitelogo.png';
 
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,6 +26,8 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,12 +47,16 @@ const LoginPage: React.FC = () => {
             const data = await response.json();
             if (response.ok) {
                 login(data.token, data.user);
-                // Redirect based on role
-                if (data.user.role === 'ADMIN') {
-                    navigate('/admin');
-                } else {
-                    navigate('/dashboard');
-                }
+                setLoggedInUser(data.user);
+                setShowSuccess(true);
+                // Navigate after showing success modal
+                setTimeout(() => {
+                    if (data.user.role === 'ADMIN') {
+                        navigate('/admin');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                }, 1800);
             } else {
                 setError(data.error || 'Login failed. Please try again.');
             }
@@ -84,11 +91,13 @@ const LoginPage: React.FC = () => {
                 <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="p-2.5 bg-white/15 backdrop-blur-md rounded-xl border border-white/10 group-hover:bg-white/25 transition-all">
-                            <Tent className="w-5 h-5 text-white" />
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/15 backdrop-blur-md border border-white/10 group-hover:bg-white/25 transition-all">
+                            <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</p>
+                            <p className="font-bold text-white text-lg leading-tight tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                Lakeside <span className="text-emerald-400">Campsite</span>
+                            </p>
                             <p className="text-white/50 text-[11px] font-medium tracking-wide uppercase">Mabini, Bohol</p>
                         </div>
                     </Link>
@@ -176,10 +185,12 @@ const LoginPage: React.FC = () => {
                 >
                     {/* Mobile logo */}
                     <Link to="/" className="lg:hidden flex items-center gap-3 mb-6 justify-center">
-                        <div className="p-2 bg-green-700/20 rounded-xl border border-green-600/30">
-                            <Tent className="w-5 h-5 text-green-700" />
+                        <div className="w-11 h-11 rounded-xl overflow-hidden bg-green-700/20 border border-green-600/30">
+                            <img src={campsiteLogo} alt="Lakeside" className="w-full h-full object-cover" />
                         </div>
-                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Lakeside</span>
+                        <span className="font-bold text-gray-900 text-lg tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            Lakeside <span className="text-emerald-500">Campsite</span>
+                        </span>
                     </Link>
 
                     {/* Header */}
@@ -312,6 +323,50 @@ const LoginPage: React.FC = () => {
                     </p>
                 </motion.div>
             </div>
+
+            {/* ═══ Login Success Modal ═══ */}
+            <AnimatePresence>
+                {showSuccess && loggedInUser && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+                            className="bg-white rounded-2xl shadow-2xl px-8 py-6 max-w-xs w-full text-center"
+                        >
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
+                                className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/25"
+                            >
+                                <motion.svg
+                                    className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"
+                                >
+                                    <motion.path
+                                        d="M5 13l4 4L19 7"
+                                        initial={{ pathLength: 0 }}
+                                        animate={{ pathLength: 1 }}
+                                        transition={{ delay: 0.25, duration: 0.35 }}
+                                    />
+                                </motion.svg>
+                            </motion.div>
+                            <p className="text-sm font-semibold text-gray-800 mb-1">Welcome, {loggedInUser.firstName}!</p>
+                            <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+                                <div className="w-3.5 h-3.5 border-2 border-green-200 border-t-green-600 rounded-full animate-spin" />
+                                Directing to {loggedInUser.role === 'ADMIN' ? 'admin panel' : 'dashboard'}…
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
